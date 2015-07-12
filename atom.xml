@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[The Road To Mastery]]></title>
-  <link href="http://bennacer860.github.io/atom.xml" rel="self"/>
-  <link href="http://bennacer860.github.io/"/>
-  <updated>2015-07-12T14:31:07-04:00</updated>
-  <id>http://bennacer860.github.io/</id>
+  <link href="http://routetomastery.com/atom.xml" rel="self"/>
+  <link href="http://routetomastery.com/"/>
+  <updated>2015-07-12T14:29:13-04:00</updated>
+  <id>http://routetomastery.com/</id>
   <author>
     <name><![CDATA[Rafik Bennacer]]></name>
     
@@ -15,10 +15,621 @@
   
   <entry>
     <title type="html"><![CDATA[test]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/07/12/test/"/>
+    <link href="http://routetomastery.com/blog/2015/07/12/test/"/>
     <updated>2015-07-12T14:29:12-04:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/07/12/test</id>
+    <id>http://routetomastery.com/blog/2015/07/12/test</id>
     <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Rspec internals (part 1)]]></title>
+    <link href="http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/"/>
+    <updated>2015-02-17T13:53:30-05:00</updated>
+    <id>http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1</id>
+    <content type="html"><![CDATA[<p>If you wonder how Rspec is built and is curious about the internals of such a tool then this article is for you. After watching an episode from the excellent <a href="https://www.destroyallsoftware.com/talks">Gary Bernhard&rsquo;s Destroy all software series</a> ,i decided to blog about it to make sure i understand how it works.</p>
+
+<p>We will use Minitest TestCase to test the most basic Rspec syntax. As usual let&rsquo;s write two tests, one that pass and another one that fails. And we will write the code that defines the Rspec features in spec.rb. but lets start with just the tests:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;minitest/autorun&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;spec&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">TesDecribe</span> <span class="o">&lt;</span> <span class="no">MiniTest</span><span class="o">::</span><span class="no">Unit</span><span class="o">::</span><span class="no">TestCase</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_pass</span>
+</span><span class='line'>    <span class="n">describe</span> <span class="s1">&#39;some description&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s1">&#39;has some property&#39;</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_fail</span>
+</span><span class='line'>    <span class="n">assert_raises</span><span class="p">(</span><span class="no">IndexError</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">describe</span> <span class="s1">&#39;some failing test&#39;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s1">&#39;fails&#39;</span> <span class="k">do</span>
+</span><span class='line'>          <span class="k">raise</span> <span class="no">IndexError</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this will throw a bunch of errors :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">001565</span><span class="n">s</span><span class="p">,</span> <span class="mi">1277</span><span class="o">.</span><span class="mi">9553</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">638</span><span class="o">.</span><span class="mi">9776</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="mi">1</span><span class="p">)</span> <span class="ss">Failure</span><span class="p">:</span>
+</span><span class='line'><span class="no">TestDescribe</span><span class="c1">#test_that_it_can_fail [test.rb:13]:</span>
+</span><span class='line'><span class="no">IndexError</span> <span class="n">expected</span> <span class="n">but</span> <span class="n">nothing</span> <span class="n">was</span> <span class="n">raised</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">2</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">assertions</span><span class="p">,</span> <span class="mi">1</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">0</span> <span class="n">errors</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skips</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Interesting, It seems like the  describe method is defined somehow but the block inside is not executed. It is time to start working on that spec.rb file</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#lets define describe method that will pick a description and a block and let&#39;s call that block</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">describe</span> <span class="n">description</span><span class="p">,</span><span class="o">&amp;</span><span class="n">block</span>
+</span><span class='line'>  <span class="n">block</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>let&rsquo;s run our test again</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">001240</span><span class="n">s</span><span class="p">,</span> <span class="mi">1612</span><span class="o">.</span><span class="mi">9032</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">806</span><span class="o">.</span><span class="mi">4516</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="mi">1</span><span class="p">)</span> <span class="ss">Error</span><span class="p">:</span>
+</span><span class='line'><span class="no">TestDescribe</span><span class="c1">#test_describe_method:</span>
+</span><span class='line'><span class="ss">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`it&#39; for #&lt;TestDescribe:0x007fb8158a2558&gt;</span>
+</span><span class='line'><span class="sb">    test.rb:10:in `</span><span class="n">block</span> <span class="k">in</span> <span class="n">test_describe_method</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">    test.rb:4:in `call&#39;</span>
+</span><span class='line'>    <span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">4</span><span class="ss">:in</span> <span class="sb">`describe&#39;</span>
+</span><span class='line'><span class="sb">    test.rb:9:in `</span><span class="n">test_describe_method</span><span class="s1">&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="s1">  2) Failure:</span>
+</span><span class='line'><span class="s1">TestDescribe#test_that_it_can_fail [test.rb:17]:</span>
+</span><span class='line'><span class="s1">[IndexError] exception expected, not</span>
+</span><span class='line'><span class="s1">Class: &lt;NoMethodError&gt;</span>
+</span><span class='line'><span class="s1">Message: &lt;&quot;undefined method `it&#39;</span> <span class="k">for</span> <span class="c1">#&lt;TestDescribe:0x007fb8158a1e50&gt;&quot;&gt;</span>
+</span><span class='line'><span class="o">---</span><span class="no">Backtrace</span><span class="o">---</span>
+</span><span class='line'><span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">19</span><span class="ss">:in</span> <span class="sb">`block (2 levels) in test_that_it_can_fail&#39;</span>
+</span><span class='line'><span class="sb">test.rb:4:in `</span><span class="n">call</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">test.rb:4:in `describe&#39;</span>
+</span><span class='line'><span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">18</span><span class="ss">:in</span> <span class="sb">`block in test_that_it_can_fail&#39;</span>
+</span><span class='line'><span class="sb">---------------</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is the same Exception, the block inside <code>describe</code> gets executed but there is an undefined method <code>it</code> inside. The <code>it</code> method is pretty much the same as <code>describe</code>, it will take a description and a block and will execute that block. Let&rsquo;s update our spec.rb:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#lets define describe method that will pick a description and a block and let&#39;s call that block</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">describe</span> <span class="n">description</span><span class="p">,</span><span class="o">&amp;</span><span class="n">block</span>
+</span><span class='line'> <span class="n">block</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">it</span> <span class="n">description</span><span class="p">,</span><span class="o">&amp;</span><span class="n">block</span>
+</span><span class='line'> <span class="n">block</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> let&rsquo;s run our tests again:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">000</span><span class="mi">968</span><span class="n">s</span><span class="p">,</span> <span class="mi">2066</span><span class="o">.</span><span class="mi">1157</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">1033</span><span class="o">.</span><span class="mo">057</span><span class="mi">9</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">2</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">assertions</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">0</span> <span class="n">errors</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skips</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good this is working, i can use that <code>describe do .... end</code> syntax, but how about assertions, i want to be able to do something like <code>2.should == 2</code>. As Usual let&rsquo;s do the same and build 2 tests, a passing one and a failing one.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">TestAssertion</span>  <span class="o">&lt;</span> <span class="no">MiniTest</span><span class="o">::</span><span class="no">Test</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_pass</span>
+</span><span class='line'>    <span class="mi">2</span><span class="o">.</span><span class="n">should</span> <span class="o">==</span> <span class="mi">2</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_fail</span>
+</span><span class='line'>    <span class="n">assert_raises</span> <span class="no">AssertionError</span> <span class="k">do</span>
+</span><span class='line'>      <span class="mi">1</span><span class="o">.</span><span class="n">should</span> <span class="o">==</span>  <span class="mi">2</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Obviously running test will not pass:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">001312</span><span class="n">s</span><span class="p">,</span> <span class="mi">3048</span><span class="o">.</span><span class="mi">7805</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">762</span><span class="o">.</span><span class="mi">1951</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="mi">1</span><span class="p">)</span> <span class="ss">Error</span><span class="p">:</span>
+</span><span class='line'><span class="no">TestAssertion</span><span class="c1">#test_that_it_can_fail:</span>
+</span><span class='line'><span class="ss">NameError</span><span class="p">:</span> <span class="n">uninitialized</span> <span class="n">constant</span> <span class="no">TestAssertion</span><span class="o">::</span><span class="no">AssertionError</span>
+</span><span class='line'>    <span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">17</span><span class="ss">:in</span> <span class="sb">`test_that_it_can_fail&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="sb">  2) Error:</span>
+</span><span class='line'><span class="sb">TestAssertion#test_that_it_can_pass:</span>
+</span><span class='line'><span class="sb">NoMethodError: undefined method `</span><span class="n">should</span><span class="s1">&#39; for 2:Fixnum</span>
+</span><span class='line'><span class="s1">    test.rb:13:in `test_that_it_can_pass&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I see two things , an undefined method <code>should</code> and an undefined Exception AssertionError. Let&rsquo;s update spec.rb:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="c1">#this is easy fix, just define an exception</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">AssertionErro</span> <span class="o">&lt;</span> <span class="no">Exception</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In order to implement the <code>should</code> we need to create an assertion for the object passed and it needs to work for all ruby objects so we will implement it for the <code>Object</code> class. You also need to remember that &lsquo;==&rsquo; is just syntactic sugar offered by ruby and it is the equivalent of &lsquo;equal?&rsquo;.  Basically, <code>2 == 2</code> is the same as <code>2.equal?(2)</code> . this is very important because we will define a <code>==</code> method in our <code>DelayedAssertion</code> class. Enough talking, let&rsquo;s take a look at the code in spec.rb:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Object</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">should</span>
+</span><span class='line'>    <span class="no">DelayedAssertion</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#lets define DelayedAssertion class now</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">DelayedAssertion</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@subject</span> <span class="o">=</span> <span class="n">subject</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="c1">#here where the magic happens</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">raise</span> <span class="no">AssertionError</span> <span class="k">unless</span> <span class="vi">@subject</span> <span class="o">==</span> <span class="n">other</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>let&rsquo;s run the test now:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Running:</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">0013</span><span class="mi">84</span><span class="n">s</span><span class="p">,</span> <span class="mi">2890</span><span class="o">.</span><span class="mi">1734</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">1445</span><span class="o">.</span><span class="mi">0867</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">4</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">2</span> <span class="n">assertions</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">0</span> <span class="n">errors</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skips</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Wow,  we have been able to implement some major features of Rspec. In future post i will try to add support to should method such as  <code>something.should be_true</code> or <code>array.should have(4).things</code>. You can also add your implementation as a comments.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Create your first API wrapper with TDD]]></title>
+    <link href="http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/"/>
+    <updated>2015-02-04T22:47:14-05:00</updated>
+    <id>http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd</id>
+    <content type="html"><![CDATA[<p>Whether at you job or personal projects you would need at some point have to build you own API wrapper in ruby. Today, i decided to build my own Wrapper that i will turn into a gem in a later blog post. I want to do it methodically according to Test Driven Development principles.</p>
+
+<p>It is always a hassle to test API calls but there is a way on how it should be done and we will talk about it later on.</p>
+
+<p>I picked the <a href="https://developer.wmata.com/">WMATA API</a> because it is well written and well documented. As you can see in their developer website each call has <a href="https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f">a json response example</a>. We will use these to test our code against it later.</p>
+
+<p>Let&rsquo;s talk about our goal. I want to be able to set <a href="https://developer.wmata.com/demokey">my api key</a> and then make an api call in this manner:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="s2">&quot;kfgpmgvfgacx98de9q3xazww&quot;</span>
+</span><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="s2">&quot;A01&quot;</span><span class="p">)</span> <span class="c1"># A01 stands for a station code</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, that i know what i want, let&rsquo;s set up our TDD environment. The initial repository tree would look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">lib</span>
+</span><span class='line'><span class="o">|</span><span class="n">___wamta</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="n">spec</span>
+</span><span class='line'><span class="o">|</span><span class="n">___spec_helper</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="o">|</span><span class="n">___trains_helper</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="no">Gemfile</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s take a look at the <code>Gemfile</code> and see what are the tools we are going to use:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;httparty&#39;</span> <span class="c1">#i use httparty to make http queries </span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;pry&#39;</span> <span class="c1">#i use binding.pry to open a IRB console during runtime</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;webmock&#39;</span> <span class="p">,</span> <span class="ss">group</span><span class="p">:</span> <span class="ss">:test</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;rspec&#39;</span> <span class="p">,</span> <span class="ss">group</span><span class="p">:</span> <span class="ss">:test</span> <span class="c1"># this is my favorite testing framework</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we have all the necessary gems do a <code>bundle install</code>. Let&rsquo;s take a look at the <code>spec/spec_helper.rb</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span> <span class="s1">&#39;lib&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;wmata&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;webmock/rspec&#39;</span>
+</span><span class='line'><span class="no">WebMock</span><span class="o">.</span><span class="n">disable_net_connect!</span><span class="p">(</span><span class="ss">allow_localhost</span><span class="p">:</span> <span class="kp">true</span><span class="p">)</span>
+</span><span class='line'><span class="no">RSpec</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">config</span><span class="o">.</span><span class="n">before</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">stub_request</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="sr">%r|https://api.wmata.com/StationPrediction.svc/json/GetPrediction/|</span><span class="p">)</span><span class="o">.</span>
+</span><span class='line'>        <span class="n">to_return</span><span class="p">(</span><span class="ss">status</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="ss">body</span><span class="p">:</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;./spec/fixtures/next_trains.json&quot;</span><span class="p">){</span><span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">},</span> <span class="ss">headers</span><span class="p">:</span> <span class="p">{})</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is where it get&rsquo;s tricky. If you rely on the API, your tests are not really tests, because they depend on the status of the API. If you have no internet, those tests will not work. Your tests should only test your own code, not the response of the API. We are using webmock to return to each call made to <code>https://api.wmata.com/StationPrediction.svc/json/GetPrediction/</code> the json response  in <code>next_trains.json</code>. This response is the expected result provided by the documentation <a href="https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f">here</a></p>
+
+<p> So let&rsquo;s add the file <code>next_trains.json</code> in <code>spec/fixtures/next_trains.json</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Trains&quot;</span><span class="p">:[</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Car&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Destination&quot;</span><span class="p">:</span><span class="s2">&quot;SilvrSpg&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationCode&quot;</span><span class="p">:</span><span class="s2">&quot;B08&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationName&quot;</span><span class="p">:</span><span class="s2">&quot;Silver Spring&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Group&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Line&quot;</span><span class="p">:</span><span class="s2">&quot;RD&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A01&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationName&quot;</span><span class="p">:</span><span class="s2">&quot;Metro Center&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Min&quot;</span><span class="p">:</span><span class="s2">&quot;3&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Car&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Destination&quot;</span><span class="p">:</span><span class="s2">&quot;Grsvnor&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A11&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationName&quot;</span><span class="p">:</span><span class="s2">&quot;Grosvenor-Strathmore&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Group&quot;</span><span class="p">:</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Line&quot;</span><span class="p">:</span><span class="s2">&quot;RD&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A01&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationName&quot;</span><span class="p">:</span><span class="s2">&quot;Metro Center&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Min&quot;</span><span class="p">:</span><span class="s2">&quot;4&quot;</span>
+</span><span class='line'><span class="p">}]}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We have everything setup now let&rsquo;s write our first test in <code>spec/train_spec.rb</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="n">describe</span> <span class="no">WMATA</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">)</span> <span class="p">{</span> <span class="no">WMATA</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="s1">&#39;xxxxx&#39;</span>  <span class="p">}</span>
+</span><span class='line'>     <span class="n">it</span> <span class="s1">&#39;should predict next trains&#39;</span> <span class="k">do</span>
+</span><span class='line'>       <span class="n">expect</span><span class="p">(</span><span class="no">WMATA</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">respond_to</span> <span class="ss">:next_trains</span>
+</span><span class='line'>       <span class="n">next_trains</span> <span class="o">=</span> <span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span>
+</span><span class='line'>       <span class="n">expect</span><span class="p">(</span><span class="n">next_trains</span><span class="p">)</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_empty</span>
+</span><span class='line'>       <span class="o">[</span><span class="s2">&quot;Car&quot;</span><span class="p">,</span><span class="s2">&quot;Min&quot;</span><span class="p">,</span><span class="s2">&quot;DestinationName&quot;</span><span class="o">].</span><span class="n">each</span><span class="p">{</span> <span class="o">|</span><span class="n">field</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">expect</span><span class="p">(</span><span class="n">next_trains</span><span class="o">.</span><span class="n">first</span><span class="o">[</span><span class="n">field</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_nil</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>   <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice that the api key does not have to be real because the call to the live api will not be made. It will be mocked and will return the expected json response.</p>
+
+<p>Let&rsquo;s create the module that will handle the API calls in <code>lib/wamta.rb</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">))</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;client&#39;</span>
+</span><span class='line'><span class="k">module</span> <span class="nn">WMATA</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">client</span>
+</span><span class='line'>    <span class="vi">@client</span> <span class="o">||=</span> <span class="no">Client</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">api</span>
+</span><span class='line'>    <span class="vi">@api</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;please set the api key&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">api</span><span class="o">=</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@client</span> <span class="o">=</span> <span class="no">Client</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@api</span> <span class="o">=</span> <span class="n">api_key</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">next_trains</span><span class="p">(</span><span class="n">station</span> <span class="o">=</span> <span class="s2">&quot;A06&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">client</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good, now we have a module that will create a client object when an api_key is passed and if we want to call <code>next_trains</code> without setting up the api key it will throw an exception &ldquo;please set the api key&rdquo;. Now, let&rsquo;s create the Client class in <code>lib/client.rb</code> that will actually handle the API calls.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;httparty&#39;</span>
+</span><span class='line'><span class="k">module</span> <span class="nn">WMATA</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Client</span>
+</span><span class='line'>    <span class="kp">include</span> <span class="no">HTTParty</span>
+</span><span class='line'>    <span class="n">base_uri</span> <span class="s2">&quot;https://api.wmata.com&quot;</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span><span class="ss">query</span><span class="p">:</span> <span class="p">{</span><span class="ss">api_key</span><span class="p">:</span> <span class="n">api_key</span><span class="p">}</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">next_trains</span><span class="p">(</span><span class="n">stations</span><span class="o">=</span><span class="s1">&#39;A06&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">response</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/StationPrediction.svc/json/GetPrediction/</span><span class="si">#{</span><span class="n">stations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="vi">@options</span><span class="p">)</span>
+</span><span class='line'>      <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">[</span><span class="s2">&quot;Trains&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you run the tests now, everything should be green. This part makes sure that our code handles correctly the expected response, now let&rsquo;s make a live API call :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="s2">&quot;kfgpmgvfgacx98de9q3xazww&quot;</span>
+</span><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="s2">&quot;A01&quot;</span><span class="p">)</span> <span class="c1"># A01 stands for a station code</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It should return an array of all the next trains for the specified station. Now that it is working we can do the same for all the other api calls</p>
+
+<p><img src="http://i.imgur.com/tEiuIfo.png" alt="alt" /></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[HTTParty debugging]]></title>
+    <link href="http://routetomastery.com/blog/2015/01/02/httparty-debugging/"/>
+    <updated>2015-01-02T15:24:47-05:00</updated>
+    <id>http://routetomastery.com/blog/2015/01/02/httparty-debugging</id>
+    <content type="html"><![CDATA[<p>Whenever you start working on API call you should use HTTParty. In my opinion it is the best tool to make a API wrapper in a very modular way.I have been playing with it lately, and i got this weird error</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/Users/***/.rvm/rubies/ruby-2.1.5/lib/ruby/2.1.0/uri/generic.rb:214:in `initialize':
+</span><span class='line'>the scheme http does not accept registry part: :80 (or bad hostname?) (URI::InvalidURIError)`</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Well, i know that HTTParty rely on URI module, but i would like to have more details in order to debug it. How about getting more verbose for the http requests i am making. The solution is easy, HTTParty provides a simple tool called debug_output. You can display the debug in stderr and it will show you only the errors or jsut be more verbose and use stdout, it woudl be something like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="kp">include</span> <span class="no">HTTParty</span>
+</span><span class='line'><span class="n">debug_output</span> <span class="vg">$stdout</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>let see the output:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">opening</span> <span class="n">connection</span> <span class="n">to</span> <span class="n">api</span><span class="o">.</span><span class="n">themoviedb</span><span class="o">.</span><span class="n">org</span><span class="p">:</span><span class="mi">80</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">opened</span>
+</span><span class='line'><span class="o">&lt;-</span> <span class="s2">&quot;GET /3movie/12?api_key=87465574ffc9 HTTP/1.1</span><span class="se">\r\n</span><span class="s2">Accept: application/json</span><span class="se">\r\n</span><span class="s2">Content-Type: application/json</span><span class="se">\r\n</span><span class="s2">Connection: close</span><span class="se">\r\n</span><span class="s2">Host: api.themoviedb.org</span><span class="se">\r\n\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;HTTP/1.1 404 Not Found</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Content-Type: text/html</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Date: Fri, 02 Jan 2015 20:20:30 GMT</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Server: nginx</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Content-Length: 162</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Connection: Close</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Mmmm&hellip;i was making a /3movie/ call instead of movie/3, i know what my problem is now.</p>
 ]]></content>
   </entry>
   

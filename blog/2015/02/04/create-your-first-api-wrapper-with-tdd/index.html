@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Create your first API wrapper with TDD - The Road To Mastery</title>
+  <meta name="author" content="Rafik Bennacer">
+
+  
+  <meta name="description" content="Whether at you job or personal projects you would need at some point have to build you own API wrapper in ruby. Today, i decided to build my own &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="The Road To Mastery" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12142135-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">The Road To Mastery</a></h1>
+  
+    <h2>From Ruby intermediate to Master...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:routetomastery.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Create Your First API Wrapper With TDD</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-04T22:47:14-05:00" pubdate data-updated="true"></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Whether at you job or personal projects you would need at some point have to build you own API wrapper in ruby. Today, i decided to build my own Wrapper that i will turn into a gem in a later blog post. I want to do it methodically according to Test Driven Development principles.</p>
+
+<p>It is always a hassle to test API calls but there is a way on how it should be done and we will talk about it later on.</p>
+
+<p>I picked the <a href="https://developer.wmata.com/">WMATA API</a> because it is well written and well documented. As you can see in their developer website each call has <a href="https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f">a json response example</a>. We will use these to test our code against it later.</p>
+
+<p>Let&rsquo;s talk about our goal. I want to be able to set <a href="https://developer.wmata.com/demokey">my api key</a> and then make an api call in this manner:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="s2">&quot;kfgpmgvfgacx98de9q3xazww&quot;</span>
+</span><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="s2">&quot;A01&quot;</span><span class="p">)</span> <span class="c1"># A01 stands for a station code</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, that i know what i want, let&rsquo;s set up our TDD environment. The initial repository tree would look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">lib</span>
+</span><span class='line'><span class="o">|</span><span class="n">___wamta</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="n">spec</span>
+</span><span class='line'><span class="o">|</span><span class="n">___spec_helper</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="o">|</span><span class="n">___trains_helper</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="no">Gemfile</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s take a look at the <code>Gemfile</code> and see what are the tools we are going to use:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;httparty&#39;</span> <span class="c1">#i use httparty to make http queries </span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;pry&#39;</span> <span class="c1">#i use binding.pry to open a IRB console during runtime</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;webmock&#39;</span> <span class="p">,</span> <span class="ss">group</span><span class="p">:</span> <span class="ss">:test</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;rspec&#39;</span> <span class="p">,</span> <span class="ss">group</span><span class="p">:</span> <span class="ss">:test</span> <span class="c1"># this is my favorite testing framework</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we have all the necessary gems do a <code>bundle install</code>. Let&rsquo;s take a look at the <code>spec/spec_helper.rb</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span> <span class="s1">&#39;lib&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;wmata&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;webmock/rspec&#39;</span>
+</span><span class='line'><span class="no">WebMock</span><span class="o">.</span><span class="n">disable_net_connect!</span><span class="p">(</span><span class="ss">allow_localhost</span><span class="p">:</span> <span class="kp">true</span><span class="p">)</span>
+</span><span class='line'><span class="no">RSpec</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">config</span><span class="o">.</span><span class="n">before</span><span class="p">(</span><span class="ss">:each</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">stub_request</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="sr">%r|https://api.wmata.com/StationPrediction.svc/json/GetPrediction/|</span><span class="p">)</span><span class="o">.</span>
+</span><span class='line'>        <span class="n">to_return</span><span class="p">(</span><span class="ss">status</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="ss">body</span><span class="p">:</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;./spec/fixtures/next_trains.json&quot;</span><span class="p">){</span><span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">},</span> <span class="ss">headers</span><span class="p">:</span> <span class="p">{})</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is where it get&rsquo;s tricky. If you rely on the API, your tests are not really tests, because they depend on the status of the API. If you have no internet, those tests will not work. Your tests should only test your own code, not the response of the API. We are using webmock to return to each call made to <code>https://api.wmata.com/StationPrediction.svc/json/GetPrediction/</code> the json response  in <code>next_trains.json</code>. This response is the expected result provided by the documentation <a href="https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f">here</a></p>
+
+<p> So let&rsquo;s add the file <code>next_trains.json</code> in <code>spec/fixtures/next_trains.json</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Trains&quot;</span><span class="p">:[</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Car&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Destination&quot;</span><span class="p">:</span><span class="s2">&quot;SilvrSpg&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationCode&quot;</span><span class="p">:</span><span class="s2">&quot;B08&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationName&quot;</span><span class="p">:</span><span class="s2">&quot;Silver Spring&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Group&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Line&quot;</span><span class="p">:</span><span class="s2">&quot;RD&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A01&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationName&quot;</span><span class="p">:</span><span class="s2">&quot;Metro Center&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Min&quot;</span><span class="p">:</span><span class="s2">&quot;3&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Car&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Destination&quot;</span><span class="p">:</span><span class="s2">&quot;Grsvnor&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A11&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;DestinationName&quot;</span><span class="p">:</span><span class="s2">&quot;Grosvenor-Strathmore&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Group&quot;</span><span class="p">:</span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Line&quot;</span><span class="p">:</span><span class="s2">&quot;RD&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A01&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;LocationName&quot;</span><span class="p">:</span><span class="s2">&quot;Metro Center&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;Min&quot;</span><span class="p">:</span><span class="s2">&quot;4&quot;</span>
+</span><span class='line'><span class="p">}]}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We have everything setup now let&rsquo;s write our first test in <code>spec/train_spec.rb</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class='line'><span class="n">describe</span> <span class="no">WMATA</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">)</span> <span class="p">{</span> <span class="no">WMATA</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="s1">&#39;xxxxx&#39;</span>  <span class="p">}</span>
+</span><span class='line'>     <span class="n">it</span> <span class="s1">&#39;should predict next trains&#39;</span> <span class="k">do</span>
+</span><span class='line'>       <span class="n">expect</span><span class="p">(</span><span class="no">WMATA</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">respond_to</span> <span class="ss">:next_trains</span>
+</span><span class='line'>       <span class="n">next_trains</span> <span class="o">=</span> <span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span>
+</span><span class='line'>       <span class="n">expect</span><span class="p">(</span><span class="n">next_trains</span><span class="p">)</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_empty</span>
+</span><span class='line'>       <span class="o">[</span><span class="s2">&quot;Car&quot;</span><span class="p">,</span><span class="s2">&quot;Min&quot;</span><span class="p">,</span><span class="s2">&quot;DestinationName&quot;</span><span class="o">].</span><span class="n">each</span><span class="p">{</span> <span class="o">|</span><span class="n">field</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">expect</span><span class="p">(</span><span class="n">next_trains</span><span class="o">.</span><span class="n">first</span><span class="o">[</span><span class="n">field</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">not_to</span> <span class="n">be_nil</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>   <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice that the api key does not have to be real because the call to the live api will not be made. It will be mocked and will return the expected json response.</p>
+
+<p>Let&rsquo;s create the module that will handle the API calls in <code>lib/wamta.rb</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">))</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;client&#39;</span>
+</span><span class='line'><span class="k">module</span> <span class="nn">WMATA</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">client</span>
+</span><span class='line'>    <span class="vi">@client</span> <span class="o">||=</span> <span class="no">Client</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">api</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">api</span>
+</span><span class='line'>    <span class="vi">@api</span> <span class="o">||</span> <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;please set the api key&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">api</span><span class="o">=</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@client</span> <span class="o">=</span> <span class="no">Client</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@api</span> <span class="o">=</span> <span class="n">api_key</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">next_trains</span><span class="p">(</span><span class="n">station</span> <span class="o">=</span> <span class="s2">&quot;A06&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">client</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good, now we have a module that will create a client object when an api_key is passed and if we want to call <code>next_trains</code> without setting up the api key it will throw an exception &ldquo;please set the api key&rdquo;. Now, let&rsquo;s create the Client class in <code>lib/client.rb</code> that will actually handle the API calls.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;httparty&#39;</span>
+</span><span class='line'><span class="k">module</span> <span class="nn">WMATA</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Client</span>
+</span><span class='line'>    <span class="kp">include</span> <span class="no">HTTParty</span>
+</span><span class='line'>    <span class="n">base_uri</span> <span class="s2">&quot;https://api.wmata.com&quot;</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span>
+</span><span class='line'>        <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span><span class="ss">query</span><span class="p">:</span> <span class="p">{</span><span class="ss">api_key</span><span class="p">:</span> <span class="n">api_key</span><span class="p">}</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">next_trains</span><span class="p">(</span><span class="n">stations</span><span class="o">=</span><span class="s1">&#39;A06&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">response</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/StationPrediction.svc/json/GetPrediction/</span><span class="si">#{</span><span class="n">stations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="vi">@options</span><span class="p">)</span>
+</span><span class='line'>      <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">[</span><span class="s2">&quot;Trains&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you run the tests now, everything should be green. This part makes sure that our code handles correctly the expected response, now let&rsquo;s make a live API call :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="s2">&quot;kfgpmgvfgacx98de9q3xazww&quot;</span>
+</span><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="s2">&quot;A01&quot;</span><span class="p">)</span> <span class="c1"># A01 stands for a station code</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It should return an array of all the next trains for the specified station. Now that it is working we can do the same for all the other api calls</p>
+
+<p><img src="http://i.imgur.com/tEiuIfo.png" alt="alt" /></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafik Bennacer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-04T22:47:14-05:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/" data-via="" data-counturl="http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/01/02/httparty-debugging/" title="Previous Post: HTTParty debugging">&laquo; HTTParty debugging</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/02/17/rspec-internals-part-1/" title="Next Post: Rspec internals (part 1)">Rspec internals (part 1) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/test/">test</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/17/rspec-internals-part-1/">Rspec internals (part 1)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/">Create your first API wrapper with TDD</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/02/httparty-debugging/">HTTParty debugging</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rafik Bennacer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'roadtomastery';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/';
+        var disqus_url = 'http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

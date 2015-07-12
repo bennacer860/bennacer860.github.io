@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Rspec internals (part 1) - The Road To Mastery</title>
+  <meta name="author" content="Rafik Bennacer">
+
+  
+  <meta name="description" content="If you wonder how Rspec is built and is curious about the internals of such a tool then this article is for you. After watching an episode from the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="The Road To Mastery" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12142135-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">The Road To Mastery</a></h1>
+  
+    <h2>From Ruby intermediate to Master...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:routetomastery.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Rspec Internals (Part 1)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-17T13:53:30-05:00" pubdate data-updated="true"></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>If you wonder how Rspec is built and is curious about the internals of such a tool then this article is for you. After watching an episode from the excellent <a href="https://www.destroyallsoftware.com/talks">Gary Bernhard&rsquo;s Destroy all software series</a> ,i decided to blog about it to make sure i understand how it works.</p>
+
+<p>We will use Minitest TestCase to test the most basic Rspec syntax. As usual let&rsquo;s write two tests, one that pass and another one that fails. And we will write the code that defines the Rspec features in spec.rb. but lets start with just the tests:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;minitest/autorun&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;spec&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">TesDecribe</span> <span class="o">&lt;</span> <span class="no">MiniTest</span><span class="o">::</span><span class="no">Unit</span><span class="o">::</span><span class="no">TestCase</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_pass</span>
+</span><span class='line'>    <span class="n">describe</span> <span class="s1">&#39;some description&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s1">&#39;has some property&#39;</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_fail</span>
+</span><span class='line'>    <span class="n">assert_raises</span><span class="p">(</span><span class="no">IndexError</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">describe</span> <span class="s1">&#39;some failing test&#39;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">it</span> <span class="s1">&#39;fails&#39;</span> <span class="k">do</span>
+</span><span class='line'>          <span class="k">raise</span> <span class="no">IndexError</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running this will throw a bunch of errors :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">001565</span><span class="n">s</span><span class="p">,</span> <span class="mi">1277</span><span class="o">.</span><span class="mi">9553</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">638</span><span class="o">.</span><span class="mi">9776</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="mi">1</span><span class="p">)</span> <span class="ss">Failure</span><span class="p">:</span>
+</span><span class='line'><span class="no">TestDescribe</span><span class="c1">#test_that_it_can_fail [test.rb:13]:</span>
+</span><span class='line'><span class="no">IndexError</span> <span class="n">expected</span> <span class="n">but</span> <span class="n">nothing</span> <span class="n">was</span> <span class="n">raised</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">2</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">assertions</span><span class="p">,</span> <span class="mi">1</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">0</span> <span class="n">errors</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skips</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Interesting, It seems like the  describe method is defined somehow but the block inside is not executed. It is time to start working on that spec.rb file</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#lets define describe method that will pick a description and a block and let&#39;s call that block</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">describe</span> <span class="n">description</span><span class="p">,</span><span class="o">&amp;</span><span class="n">block</span>
+</span><span class='line'>  <span class="n">block</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>let&rsquo;s run our test again</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">001240</span><span class="n">s</span><span class="p">,</span> <span class="mi">1612</span><span class="o">.</span><span class="mi">9032</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">806</span><span class="o">.</span><span class="mi">4516</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="mi">1</span><span class="p">)</span> <span class="ss">Error</span><span class="p">:</span>
+</span><span class='line'><span class="no">TestDescribe</span><span class="c1">#test_describe_method:</span>
+</span><span class='line'><span class="ss">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`it&#39; for #&lt;TestDescribe:0x007fb8158a2558&gt;</span>
+</span><span class='line'><span class="sb">    test.rb:10:in `</span><span class="n">block</span> <span class="k">in</span> <span class="n">test_describe_method</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">    test.rb:4:in `call&#39;</span>
+</span><span class='line'>    <span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">4</span><span class="ss">:in</span> <span class="sb">`describe&#39;</span>
+</span><span class='line'><span class="sb">    test.rb:9:in `</span><span class="n">test_describe_method</span><span class="s1">&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="s1">  2) Failure:</span>
+</span><span class='line'><span class="s1">TestDescribe#test_that_it_can_fail [test.rb:17]:</span>
+</span><span class='line'><span class="s1">[IndexError] exception expected, not</span>
+</span><span class='line'><span class="s1">Class: &lt;NoMethodError&gt;</span>
+</span><span class='line'><span class="s1">Message: &lt;&quot;undefined method `it&#39;</span> <span class="k">for</span> <span class="c1">#&lt;TestDescribe:0x007fb8158a1e50&gt;&quot;&gt;</span>
+</span><span class='line'><span class="o">---</span><span class="no">Backtrace</span><span class="o">---</span>
+</span><span class='line'><span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">19</span><span class="ss">:in</span> <span class="sb">`block (2 levels) in test_that_it_can_fail&#39;</span>
+</span><span class='line'><span class="sb">test.rb:4:in `</span><span class="n">call</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">test.rb:4:in `describe&#39;</span>
+</span><span class='line'><span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">18</span><span class="ss">:in</span> <span class="sb">`block in test_that_it_can_fail&#39;</span>
+</span><span class='line'><span class="sb">---------------</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is the same Exception, the block inside <code>describe</code> gets executed but there is an undefined method <code>it</code> inside. The <code>it</code> method is pretty much the same as <code>describe</code>, it will take a description and a block and will execute that block. Let&rsquo;s update our spec.rb:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#lets define describe method that will pick a description and a block and let&#39;s call that block</span>
+</span><span class='line'><span class="k">def</span> <span class="nf">describe</span> <span class="n">description</span><span class="p">,</span><span class="o">&amp;</span><span class="n">block</span>
+</span><span class='line'> <span class="n">block</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">it</span> <span class="n">description</span><span class="p">,</span><span class="o">&amp;</span><span class="n">block</span>
+</span><span class='line'> <span class="n">block</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> let&rsquo;s run our tests again:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">000</span><span class="mi">968</span><span class="n">s</span><span class="p">,</span> <span class="mi">2066</span><span class="o">.</span><span class="mi">1157</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">1033</span><span class="o">.</span><span class="mo">057</span><span class="mi">9</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">2</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">1</span> <span class="n">assertions</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">0</span> <span class="n">errors</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skips</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good this is working, i can use that <code>describe do .... end</code> syntax, but how about assertions, i want to be able to do something like <code>2.should == 2</code>. As Usual let&rsquo;s do the same and build 2 tests, a passing one and a failing one.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">TestAssertion</span>  <span class="o">&lt;</span> <span class="no">MiniTest</span><span class="o">::</span><span class="no">Test</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_pass</span>
+</span><span class='line'>    <span class="mi">2</span><span class="o">.</span><span class="n">should</span> <span class="o">==</span> <span class="mi">2</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">test_that_it_can_fail</span>
+</span><span class='line'>    <span class="n">assert_raises</span> <span class="no">AssertionError</span> <span class="k">do</span>
+</span><span class='line'>      <span class="mi">1</span><span class="o">.</span><span class="n">should</span> <span class="o">==</span>  <span class="mi">2</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Obviously running test will not pass:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">001312</span><span class="n">s</span><span class="p">,</span> <span class="mi">3048</span><span class="o">.</span><span class="mi">7805</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">762</span><span class="o">.</span><span class="mi">1951</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="mi">1</span><span class="p">)</span> <span class="ss">Error</span><span class="p">:</span>
+</span><span class='line'><span class="no">TestAssertion</span><span class="c1">#test_that_it_can_fail:</span>
+</span><span class='line'><span class="ss">NameError</span><span class="p">:</span> <span class="n">uninitialized</span> <span class="n">constant</span> <span class="no">TestAssertion</span><span class="o">::</span><span class="no">AssertionError</span>
+</span><span class='line'>    <span class="nb">test</span><span class="o">.</span><span class="n">rb</span><span class="p">:</span><span class="mi">17</span><span class="ss">:in</span> <span class="sb">`test_that_it_can_fail&#39;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="sb">  2) Error:</span>
+</span><span class='line'><span class="sb">TestAssertion#test_that_it_can_pass:</span>
+</span><span class='line'><span class="sb">NoMethodError: undefined method `</span><span class="n">should</span><span class="s1">&#39; for 2:Fixnum</span>
+</span><span class='line'><span class="s1">    test.rb:13:in `test_that_it_can_pass&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I see two things , an undefined method <code>should</code> and an undefined Exception AssertionError. Let&rsquo;s update spec.rb:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="c1">#this is easy fix, just define an exception</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">AssertionErro</span> <span class="o">&lt;</span> <span class="no">Exception</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In order to implement the <code>should</code> we need to create an assertion for the object passed and it needs to work for all ruby objects so we will implement it for the <code>Object</code> class. You also need to remember that &lsquo;==&rsquo; is just syntactic sugar offered by ruby and it is the equivalent of &lsquo;equal?&rsquo;.  Basically, <code>2 == 2</code> is the same as <code>2.equal?(2)</code> . this is very important because we will define a <code>==</code> method in our <code>DelayedAssertion</code> class. Enough talking, let&rsquo;s take a look at the code in spec.rb:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Object</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">should</span>
+</span><span class='line'>    <span class="no">DelayedAssertion</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#lets define DelayedAssertion class now</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">DelayedAssertion</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@subject</span> <span class="o">=</span> <span class="n">subject</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="c1">#here where the magic happens</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">==</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">raise</span> <span class="no">AssertionError</span> <span class="k">unless</span> <span class="vi">@subject</span> <span class="o">==</span> <span class="n">other</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>let&rsquo;s run the test now:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Running:</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">0013</span><span class="mi">84</span><span class="n">s</span><span class="p">,</span> <span class="mi">2890</span><span class="o">.</span><span class="mi">1734</span> <span class="n">runs</span><span class="o">/</span><span class="n">s</span><span class="p">,</span> <span class="mi">1445</span><span class="o">.</span><span class="mi">0867</span> <span class="n">assertions</span><span class="o">/</span><span class="n">s</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="mi">4</span> <span class="n">runs</span><span class="p">,</span> <span class="mi">2</span> <span class="n">assertions</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span><span class="p">,</span> <span class="mi">0</span> <span class="n">errors</span><span class="p">,</span> <span class="mi">0</span> <span class="n">skips</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Wow,  we have been able to implement some major features of Rspec. In future post i will try to add support to should method such as  <code>something.should be_true</code> or <code>array.should have(4).things</code>. You can also add your implementation as a comments.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafik Bennacer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-17T13:53:30-05:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/" data-via="" data-counturl="http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/" title="Previous Post: Create your first API wrapper with TDD">&laquo; Create your first API wrapper with TDD</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/07/12/test/" title="Next Post: test">test &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/test/">test</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/17/rspec-internals-part-1/">Rspec internals (part 1)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/">Create your first API wrapper with TDD</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/02/httparty-debugging/">HTTParty debugging</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rafik Bennacer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'roadtomastery';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/';
+        var disqus_url = 'http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
