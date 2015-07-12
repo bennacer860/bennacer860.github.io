@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://bennacer860.github.io/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/</loc>
+    <lastmod>2015-07-12T15:20:15-04:00</lastmod>
+  </url>
+  <url>
+    <loc>http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/</loc>
+    <lastmod>2015-07-12T15:14:18-04:00</lastmod>
+  </url>
+  <url>
     <loc>http://bennacer860.github.io/blog/2015/03/15/coalesce/</loc>
     <lastmod>2015-03-15T23:47:14-04:00</lastmod>
   </url>

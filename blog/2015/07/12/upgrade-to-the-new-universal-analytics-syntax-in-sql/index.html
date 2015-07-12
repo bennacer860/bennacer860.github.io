@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Upgrade to the new Universal Analytics Syntax in SQL - The Road To Mastery</title>
+  <meta name="author" content="Rafik Bennacer">
+
+  
+  <meta name="description" content="Upgrade to the Universal Analytics Syntax in SQL We are all struggling with upgrading our analytics tools from the old ga.js to the new universal.js &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="The Road To Mastery" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12142135-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">The Road To Mastery</a></h1>
+  
+    <h2>From Ruby intermediate to Master...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:bennacer860.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Upgrade to the New Universal Analytics Syntax in SQL</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-12T15:14:18-04:00" pubdate data-updated="true"></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Upgrade to the Universal Analytics Syntax in SQL</p>
+
+<p>We are all struggling with upgrading our analytics tools from the old ga.js to the new universal.js plateform.
+Most of it is done automatically and would require just changing that ga.js file. But would would happen to event tracking? all that <code>_gaq.push(['_trackEvent', 'button', 'event'])</code> that should be turned into something like this <code>ga('send', 'event', 'button');</code></p>
+
+<p>In this post we are going to update our syntax that is present in a code stored in Postgres. This is very common, just imagine you have a table <code>post</code> with a field <code>body</code> and you want to track some click on a specific post. so you would have something like <code>a href="#" onClick="_gaq.push(['_trackEvent', 'Videos', 'Play', 'Baby\'s First Birthday']);"&gt;Play&lt;/a&gt;</code> . We need to figure out ways to track all the instances of this syntax and then replace it with the new syntax. We don&rsquo;t want to do it by hand if there are more than 2 :), that would take forever!! so let&rsquo;s figure out an automated way</p>
+
+<p>Doing this with a Programming Language would take a long time, the best way seems to be SQL. We need to find all the <code>posts</code> where the tracking event is used:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'> <span class="k">select</span> <span class="n">id</span><span class="p">,</span><span class="n">regexp_matches</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;_gaq.push\(\[\s*?&#39;&#39;\s*?_trackEvent\s*?&#39;&#39;\s*?,(.+?)\]\)&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="k">match</span>
+</span><span class='line'>  <span class="k">from</span>  <span class="n">posts</span> <span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good, now let&rsquo;s make sure that this would capture multiple instances in a single post, so let&rsquo;s create a query that would display every post and how many matches it has:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">posts</span><span class="p">,</span> <span class="n">regexp_matches</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;_gaq.push\(\[\s*?&#39;&#39;\s*?_trackEvent\s*?&#39;&#39;\s*?,(.+?)\]\)&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">id</span> <span class="k">HAVING</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>it would look like this:</p>
+
+<pre><code>        id   | count
+   19911 |     1
+   20894 |     6
+   19717 |     8
+   19178 |     1
+   ..... | .....
+</code></pre>
+
+<p>Now that our regex capture all the instances of the old syntax, it is time to change it. Let&rsquo;s update our table with the new syntax:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">begin</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">UPDATE</span> <span class="n">posts</span> <span class="k">SET</span> <span class="k">DATA</span> <span class="o">=</span> <span class="n">regexp_replace</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;_gaq.push\(\[\s*?&#39;&#39;\s*?_trackEvent\s*?&#39;&#39;\s*?,(.+?)\]\)&#39;</span><span class="p">,</span> <span class="s1">&#39;ga(&#39;&#39;send&#39;&#39;,&#39;&#39;event&#39;&#39;,\1)&#39;</span><span class="p">,</span><span class="s1">&#39;gi&#39;</span> <span class="p">)</span>
+</span><span class='line'>        <span class="k">WHERE</span> <span class="n">id</span> <span class="k">IN</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="n">id</span> <span class="k">FROM</span> <span class="n">posts</span>
+</span><span class='line'>                           <span class="k">WHERE</span> <span class="k">DATA</span><span class="p">::</span><span class="nb">text</span> <span class="k">LIKE</span> <span class="s1">&#39;%_gaq.push%&#39;</span> <span class="p">);</span>
+</span><span class='line'><span class="k">commit</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This looks scary but it is not!! I am capturing the parameter for <code>_gaq.push</code> and will create a new function call <code>ga(...)</code>  using the <code>\1</code> .</p>
+
+<p>And you should be ready to go now. You can see the event tracking in real time, that is the best way to test it!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafik Bennacer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-12T15:14:18-04:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/" data-via="" data-counturl="http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/15/coalesce/" title="Previous Post: Coalesce">&laquo; Coalesce</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/" title="Next Post: Find Who is Accessing my Google Drive Files">Find Who is Accessing my Google Drive Files &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/">Find Who is Accessing my Google Drive Files</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">Upgrade to the new Universal Analytics Syntax in SQL</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/15/coalesce/">Coalesce</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/28/fun-with-next-train/">Fun with next train</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/26/activerecord-dirty-change/">ActiveRecord dirty change</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rafik Bennacer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'roadtomastery';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/';
+        var disqus_url = 'http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

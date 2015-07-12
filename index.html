@@ -9,8 +9,7 @@
   <meta name="author" content="Rafik Bennacer">
 
   
-  <meta name="description" content="If you have never heard about the coalesce function, this will be very helpful.
-Basically this function exist in most modern DBMS and the definition &hellip;">
+  <meta name="description" content="I Recently had to share some documents from my Google Drive with a team of developers outside the office. Most of these documents were API docs. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,6 +80,346 @@ Basically this function exist in most modern DBMS and the definition &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/">Find Who Is Accessing My Google Drive Files</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-12T15:20:15-04:00" pubdate data-updated="true"></time>
+        
+         | <a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I Recently had to share some documents from my Google Drive with a team of developers outside the office. Most of these documents were API docs. After a couple of months and when those developers didn&rsquo;t need the API docs anymore, it was almost impossible for me to find what i shared with them, it was like looking for a needle in a haystack. I bet i am not the only one that had this problem before!!!</p>
+
+<p>So how would i do that manually. I would go to each file and click on share button. see the list of the permission and remove the users i don&rsquo;t want to. It means that i would need to go through 200 files!!! I am too lazy for that!!</p>
+
+<p> <img src="http://i.stack.imgur.com/tVwCC.gif" alt="https://github.com/gimite/google-drive-ruby" /></p>
+
+<p>Since i like Ruby programming i thought about using the Google Drive API to accomplish this task. I looked at <a href="https://github.com/gimite/google-drive-ruby">this gem</a> and i was immediately discouraged by it&rsquo;s complexity.  It has to be a better solution!!!</p>
+
+<p>After looking at <a href="https://developers.google.com/apps-script/overview">Google Script overview page</a> i realized that this is going to be fairly easy to solve an amazing complex problem. Google Script use a language based on Javascript and this <a href="https://developers.google.com/apps-script/reference/calendar/">API doc</a>.</p>
+
+<p>This code is largely inspired from <a href="">Amit Agarwal</a> code.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>function Start() {
+</span><span class='line'>  
+</span><span class='line'>  
+</span><span class='line'>  var files = DriveApp.getFiles();  
+</span><span class='line'>  var timezone = Session.getScriptTimeZone();
+</span><span class='line'>  var email = Session.getActiveUser().getEmail();
+</span><span class='line'>  
+</span><span class='line'>  var MAXFILES = 300; count=1;
+</span><span class='line'>  var file, date, access, url, permission;
+</span><span class='line'>  var privacy, view, viewers, edit, editors;
+</span><span class='line'>  
+</span><span class='line'>  var rows = [["File Name", "Who has access?", "Date Created"]];
+</span><span class='line'>  
+</span><span class='line'>  for (var i=0; i&lt;MAXFILES && files.hasNext(); i++ ) {
+</span><span class='line'>    
+</span><span class='line'>    file = files.next();
+</span><span class='line'>    
+</span><span class='line'>    try {
+</span><span class='line'>      
+</span><span class='line'>      access     = file.getSharingAccess();
+</span><span class='line'>      permission = file.getSharingPermission();
+</span><span class='line'>      viewers    = file.getViewers();      
+</span><span class='line'>      editors    = file.getEditors();
+</span><span class='line'>      
+</span><span class='line'>      view = [];
+</span><span class='line'>      edit = [];
+</span><span class='line'>      
+</span><span class='line'>      date =  Utilities.formatDate(file.getDateCreated(), timezone, "yyyy-MM-dd HH:mm")
+</span><span class='line'>      url = count++ + '. &lt;a href="' + file.getUrl() + '"&gt;' + file.getName() + '&lt;/a&gt;';
+</span><span class='line'>      
+</span><span class='line'>      for (var v=0; v&lt;viewers.length; v++) {                
+</span><span class='line'>        view.push(viewers[v].getName() + " " + viewers[v].getEmail());
+</span><span class='line'>      }
+</span><span class='line'>      
+</span><span class='line'>      for (var ed=0; ed&lt;editors.length; ed++) {                
+</span><span class='line'>        edit.push(editors[ed].getName() + " " + editors[ed].getEmail());
+</span><span class='line'>      }
+</span><span class='line'>      
+</span><span class='line'>      switch(access) {
+</span><span class='line'>        case DriveApp.Access.PRIVATE:
+</span><span class='line'>          privacy = "Private";
+</span><span class='line'>          break;
+</span><span class='line'>        case DriveApp.Access.ANYONE:
+</span><span class='line'>          privacy = "Anyone";
+</span><span class='line'>          break;
+</span><span class='line'>        case DriveApp.Access.ANYONE_WITH_LINK:
+</span><span class='line'>          privacy = "Anyone with a link";
+</span><span class='line'>          break;
+</span><span class='line'>        case DriveApp.Access.DOMAIN:
+</span><span class='line'>          privacy = "Anyone inside domain";
+</span><span class='line'>          break;
+</span><span class='line'>        case DriveApp.Access.DOMAIN_WITH_LINK:
+</span><span class='line'>          privacy = "Anyone inside domain who has the link";
+</span><span class='line'>          break;
+</span><span class='line'>        default:
+</span><span class='line'>          privacy = "Unknown";
+</span><span class='line'>      }
+</span><span class='line'>      
+</span><span class='line'>      switch(permission) {
+</span><span class='line'>        case DriveApp.Permission.COMMENT:
+</span><span class='line'>          permission = "can comment";
+</span><span class='line'>          break;
+</span><span class='line'>        case DriveApp.Permission.VIEW:
+</span><span class='line'>          permission = "can view";
+</span><span class='line'>          break;
+</span><span class='line'>        case DriveApp.Permission.EDIT:
+</span><span class='line'>          permission = "can edit";
+</span><span class='line'>          break;
+</span><span class='line'>        default:
+</span><span class='line'>          permission = "";
+</span><span class='line'>      }
+</span><span class='line'>      
+</span><span class='line'>      view = view.join(", ");
+</span><span class='line'>            
+</span><span class='line'>      edit = edit.join(", ");
+</span><span class='line'>            
+</span><span class='line'>      privacy += (permission === "" ? "" : " " + permission) 
+</span><span class='line'>               + (edit === "" ? "" : "&lt;br&gt;&lt;small&gt;" + edit + " can edit&lt;/small&gt;")
+</span><span class='line'>               + (view === "" ? "" : "&lt;br&gt;&lt;small&gt;" + view + " can view&lt;/small&gt;")
+</span><span class='line'>      
+</span><span class='line'>      rows.push([url, privacy, date]);
+</span><span class='line'>      
+</span><span class='line'>    } catch (e) {Logger.log(e.toString()); Logger.log(file.getName());};
+</span><span class='line'>    
+</span><span class='line'>  }
+</span><span class='line'>  
+</span><span class='line'>  var html = "&lt;p style='text-align:center'&gt;&lt;strong&gt;&lt;a style='font-size:160%;text-decoration:none;color:#49B3F5;' File Permissions Report for Google Drive&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;";
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  html += "&lt;table border='1' cellpadding='5' cellspacing='0'&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;" + rows[0].join("&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;") + "&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;";
+</span><span class='line'>  
+</span><span class='line'>  for (var i=1; i&lt;rows.length; i++) {
+</span><span class='line'>    html += "&lt;tr&gt;&lt;td&gt;" + rows[i].join("&lt;/td&gt;&lt;td&gt;") + "&lt;/td&gt;&lt;/tr&gt;";
+</span><span class='line'>  }
+</span><span class='line'>  
+</span><span class='line'>  html += "&lt;/table&gt;";
+</span><span class='line'>  
+</span><span class='line'>  
+</span><span class='line'>  GmailApp.sendEmail(email, "Google Drive - File Permissions Report", "", {htmlBody: html});
+</span><span class='line'>  
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">Upgrade to the New Universal Analytics Syntax in SQL</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-12T15:14:18-04:00" pubdate data-updated="true"></time>
+        
+         | <a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Upgrade to the Universal Analytics Syntax in SQL</p>
+
+<p>We are all struggling with upgrading our analytics tools from the old ga.js to the new universal.js plateform.
+Most of it is done automatically and would require just changing that ga.js file. But would would happen to event tracking? all that <code>_gaq.push(['_trackEvent', 'button', 'event'])</code> that should be turned into something like this <code>ga('send', 'event', 'button');</code></p>
+
+<p>In this post we are going to update our syntax that is present in a code stored in Postgres. This is very common, just imagine you have a table <code>post</code> with a field <code>body</code> and you want to track some click on a specific post. so you would have something like <code>a href="#" onClick="_gaq.push(['_trackEvent', 'Videos', 'Play', 'Baby\'s First Birthday']);"&gt;Play&lt;/a&gt;</code> . We need to figure out ways to track all the instances of this syntax and then replace it with the new syntax. We don&rsquo;t want to do it by hand if there are more than 2 :), that would take forever!! so let&rsquo;s figure out an automated way</p>
+
+<p>Doing this with a Programming Language would take a long time, the best way seems to be SQL. We need to find all the <code>posts</code> where the tracking event is used:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'> <span class="k">select</span> <span class="n">id</span><span class="p">,</span><span class="n">regexp_matches</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;_gaq.push\(\[\s*?&#39;&#39;\s*?_trackEvent\s*?&#39;&#39;\s*?,(.+?)\]\)&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="k">match</span>
+</span><span class='line'>  <span class="k">from</span>  <span class="n">posts</span> <span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good, now let&rsquo;s make sure that this would capture multiple instances in a single post, so let&rsquo;s create a query that would display every post and how many matches it has:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">posts</span><span class="p">,</span> <span class="n">regexp_matches</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;_gaq.push\(\[\s*?&#39;&#39;\s*?_trackEvent\s*?&#39;&#39;\s*?,(.+?)\]\)&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">id</span> <span class="k">HAVING</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>it would look like this:</p>
+
+<pre><code>        id   | count
+   19911 |     1
+   20894 |     6
+   19717 |     8
+   19178 |     1
+   ..... | .....
+</code></pre>
+
+<p>Now that our regex capture all the instances of the old syntax, it is time to change it. Let&rsquo;s update our table with the new syntax:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">begin</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">UPDATE</span> <span class="n">posts</span> <span class="k">SET</span> <span class="k">DATA</span> <span class="o">=</span> <span class="n">regexp_replace</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="s1">&#39;_gaq.push\(\[\s*?&#39;&#39;\s*?_trackEvent\s*?&#39;&#39;\s*?,(.+?)\]\)&#39;</span><span class="p">,</span> <span class="s1">&#39;ga(&#39;&#39;send&#39;&#39;,&#39;&#39;event&#39;&#39;,\1)&#39;</span><span class="p">,</span><span class="s1">&#39;gi&#39;</span> <span class="p">)</span>
+</span><span class='line'>        <span class="k">WHERE</span> <span class="n">id</span> <span class="k">IN</span> <span class="p">(</span> <span class="k">SELECT</span> <span class="n">id</span> <span class="k">FROM</span> <span class="n">posts</span>
+</span><span class='line'>                           <span class="k">WHERE</span> <span class="k">DATA</span><span class="p">::</span><span class="nb">text</span> <span class="k">LIKE</span> <span class="s1">&#39;%_gaq.push%&#39;</span> <span class="p">);</span>
+</span><span class='line'><span class="k">commit</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This looks scary but it is not!! I am capturing the parameter for <code>_gaq.push</code> and will create a new function call <code>ga(...)</code>  using the <code>\1</code> .</p>
+
+<p>And you should be ready to go now. You can see the event tracking in real time, that is the best way to test it!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1199,6 +1538,14 @@ We can also extend this project to make have a full map with more than one line 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/">Find Who is Accessing my Google Drive Files</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">Upgrade to the new Universal Analytics Syntax in SQL</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/03/15/coalesce/">Coalesce</a>
       </li>
     
@@ -1208,14 +1555,6 @@ We can also extend this project to make have a full map with more than one line 
     
       <li class="post">
         <a href="/blog/2015/02/26/activerecord-dirty-change/">ActiveRecord dirty change</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/17/rspec-internals-part-1/">Rspec internals (part 1)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/">Create your first API wrapper with TDD</a>
       </li>
     
   </ul>
