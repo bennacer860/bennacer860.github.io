@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[The Road To Mastery]]></title>
+  <link href="http://routetomastery.com/atom.xml" rel="self"/>
+  <link href="http://routetomastery.com/"/>
+  <updated>2015-07-12T14:24:59-04:00</updated>
+  <id>http://routetomastery.com/</id>
+  <author>
+    <name><![CDATA[Rafik Bennacer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+</feed>
