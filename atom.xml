@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[The Road To Mastery]]></title>
-  <link href="http://routetomastery.com/atom.xml" rel="self"/>
-  <link href="http://routetomastery.com/"/>
-  <updated>2015-07-12T14:24:59-04:00</updated>
-  <id>http://routetomastery.com/</id>
+  <link href="http://bennacer860.github.io/atom.xml" rel="self"/>
+  <link href="http://bennacer860.github.io/"/>
+  <updated>2015-07-12T14:28:01-04:00</updated>
+  <id>http://bennacer860.github.io/</id>
   <author>
     <name><![CDATA[Rafik Bennacer]]></name>
     
