@@ -4,7 +4,7 @@
   <title><![CDATA[The Road To Mastery]]></title>
   <link href="http://routetomastery.com/atom.xml" rel="self"/>
   <link href="http://routetomastery.com/"/>
-  <updated>2015-07-12T14:29:13-04:00</updated>
+  <updated>2015-07-12T14:32:33-04:00</updated>
   <id>http://routetomastery.com/</id>
   <author>
     <name><![CDATA[Rafik Bennacer]]></name>
@@ -12,15 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[test]]></title>
-    <link href="http://routetomastery.com/blog/2015/07/12/test/"/>
-    <updated>2015-07-12T14:29:12-04:00</updated>
-    <id>http://routetomastery.com/blog/2015/07/12/test</id>
-    <content type="html"><![CDATA[
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Rspec internals (part 1)]]></title>
