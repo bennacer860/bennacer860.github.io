@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>HTTParty debugging - The Road To Mastery</title>
+  <title>Coalesce - The Road To Mastery</title>
   <meta name="author" content="Rafik Bennacer">
 
   
-  <meta name="description" content="Whenever you start working on API call you should use HTTParty. In my opinion it is the best tool to make a API wrapper in a very modular way.I have &hellip;">
+  <meta name="description" content="If you have never heard about the coalesce function, this will be very helpful.
+Basically this function exist in most modern DBMS and the definition &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://bennacer860.github.io/blog/2015/01/02/httparty-debugging/">
+  <link rel="canonical" href="http://bennacer860.github.io/blog/2015/03/15/coalesce/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -83,7 +84,7 @@
   
   <header>
     
-      <h1 class="entry-title">HTTParty Debugging</h1>
+      <h1 class="entry-title">Coalesce</h1>
     
     
       <p class="meta">
@@ -99,7 +100,7 @@
   
 
 
-<time datetime="2015-01-02T15:24:47-05:00" pubdate data-updated="true"></time>
+<time datetime="2015-03-15T23:47:14-04:00" pubdate data-updated="true"></time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -108,26 +109,12 @@
   </header>
 
 
-<div class="entry-content"><p>Whenever you start working on API call you should use HTTParty. In my opinion it is the best tool to make a API wrapper in a very modular way.I have been playing with it lately, and i got this weird error</p>
+<div class="entry-content"><p>If you have never heard about the <code>coalesce</code> function, this will be very helpful.
+Basically this function exist in most modern DBMS and the definition reads, <code>The COALESCE function in SQL returns the first non-NULL expression among its arguments.</code></p>
+
+<p>let&rsquo;s see a simple example in postgres:</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/Users/***/.rvm/rubies/ruby-2.1.5/lib/ruby/2.1.0/uri/generic.rb:214:in `initialize':
-</span><span class='line'>the scheme http does not accept registry part: :80 (or bad hostname?) (URI::InvalidURIError)`</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Well, i know that HTTParty rely on URI module, but i would like to have more details in order to debug it. How about getting more verbose for the http requests i am making. The solution is easy, HTTParty provides a simple tool called debug_output. You can display the debug in stderr and it will show you only the errors or jsut be more verbose and use stdout, it woudl be something like:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="kp">include</span> <span class="no">HTTParty</span>
-</span><span class='line'><span class="n">debug_output</span> <span class="vg">$stdout</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>let see the output:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -136,19 +123,80 @@
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">opening</span> <span class="n">connection</span> <span class="n">to</span> <span class="n">api</span><span class="o">.</span><span class="n">themoviedb</span><span class="o">.</span><span class="n">org</span><span class="p">:</span><span class="mi">80</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">opened</span>
-</span><span class='line'><span class="o">&lt;-</span> <span class="s2">&quot;GET /3movie/12?api_key=87465574ffc9 HTTP/1.1</span><span class="se">\r\n</span><span class="s2">Accept: application/json</span><span class="se">\r\n</span><span class="s2">Content-Type: application/json</span><span class="se">\r\n</span><span class="s2">Connection: close</span><span class="se">\r\n</span><span class="s2">Host: api.themoviedb.org</span><span class="se">\r\n\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;HTTP/1.1 404 Not Found</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Content-Type: text/html</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Date: Fri, 02 Jan 2015 20:20:30 GMT</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Server: nginx</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Content-Length: 162</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="o">-&gt;</span> <span class="s2">&quot;Connection: Close</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>create table employees
+</span><span class='line'>(
+</span><span class='line'>        name text,
+</span><span class='line'>        hourly_wage int,
+</span><span class='line'>        salary int
+</span><span class='line'>);
+</span><span class='line'>
+</span><span class='line'>insert into employees values 
+</span><span class='line'>('bob',null,40000),
+</span><span class='line'>('sam',40,null);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are 2 ways to determine the annual salary, the first one is by displaying the the value of the salary field and the second one is by calculating that salary from the hourly wage. The problem is that sometimes on of the value is null so we would need a conditional, this is where the <code>coalesce</code> function enter into play.</p>
+
+<p>Let&rsquo;s write a query that will display the annual salary regardless of the <code>null</code> values.</p>
+
+<p><code>select coalesce(hourly_wage*40*52 ,salary) as  "total salary" from employees;</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> total salary 
+</span><span class='line'>--------------
+</span><span class='line'>40000
+</span><span class='line'>83200
+</span><span class='line'>(2 rows)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Perfect,  we are having the result we want without using a <code>case</code> statement.
+Now, I am wondering what would happen if both of the values where null, let&rsquo;s try it out:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>insert into employees values ('jim',null,null);
+</span><span class='line'>select coalesce(hourly_wage*40*52 ,salary) as  "total salary" from employees;
+</span><span class='line'>
+</span><span class='line'>total salary
+</span><span class='line'>--------------
+</span><span class='line'>        40000
+</span><span class='line'>        83200
+</span><span class='line'>             
+</span><span class='line'>(3 rows)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok, So if both of the parameters are null then it will return null. However there is a way around it and it is adding another parameter at the end of the parameter list that will be the default , something like this <code>coalesce(ex1,ex2,default_value)</code>. Here is an example with the previous case:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>select coalesce(hourly_wage*40*52 ,salary,0) as  "total salary" from employee;
+</span><span class='line'> total salary 
+</span><span class='line'>--------------
+</span><span class='line'>        40000
+</span><span class='line'>        83200
+</span><span class='line'>            0
+</span><span class='line'>(3 rows)
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Mmmm&hellip;i was making a /3movie/ call instead of movie/3, i know what my problem is now.</p>
+
 </div>
 
 
@@ -171,7 +219,7 @@
   
 
 
-<time datetime="2015-01-02T15:24:47-05:00" pubdate data-updated="true"></time>
+<time datetime="2015-03-15T23:47:14-04:00" pubdate data-updated="true"></time>
       
 
 
@@ -179,7 +227,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bennacer860.github.io/blog/2015/01/02/httparty-debugging/" data-via="" data-counturl="http://bennacer860.github.io/blog/2015/01/02/httparty-debugging/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bennacer860.github.io/blog/2015/03/15/coalesce/" data-via="" data-counturl="http://bennacer860.github.io/blog/2015/03/15/coalesce/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -192,8 +240,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2015/02/28/fun-with-next-train/" title="Previous Post: Fun with next train">&laquo; Fun with next train</a>
       
-        <a class="basic-alignment right" href="/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/" title="Next Post: Create your first API wrapper with TDD">Create your first API wrapper with TDD &raquo;</a>
       
     </p>
   </footer>
@@ -259,8 +307,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://bennacer860.github.io/blog/2015/01/02/httparty-debugging/';
-        var disqus_url = 'http://bennacer860.github.io/blog/2015/01/02/httparty-debugging/';
+        var disqus_identifier = 'http://bennacer860.github.io/blog/2015/03/15/coalesce/';
+        var disqus_url = 'http://bennacer860.github.io/blog/2015/03/15/coalesce/';
         var disqus_script = 'embed.js';
       
     (function () {

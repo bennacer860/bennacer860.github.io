@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Fun with next train - The Road To Mastery</title>
+  <meta name="author" content="Rafik Bennacer">
+
+  
+  <meta name="description" content="Introduction I have been playing with creating my own API wrapper lately and i didn&rsquo;t find a good use to it. Fortunately i found inspiration &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="The Road To Mastery" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12142135-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">The Road To Mastery</a></h1>
+  
+    <h2>From Ruby intermediate to Master...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:bennacer860.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Fun With Next Train</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T20:47:14-05:00" pubdate data-updated="true"></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Introduction</h2>
+
+<p><img src="http://i.imgur.com/Ui1zIEI.png" alt="enter image description here" /></p>
+
+<p>I have been playing with creating my own <a href="http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/">API wrapper</a> lately and i didn&rsquo;t find a good use to it.  Fortunately i found inspiration when i saw my colleague building a widget for dashing.</p>
+
+<p>You can see in the image above that using the this the <a href="https://rubygems.org/gems/ruby_wmata">ruby_wmata gem</a> i can see when are the next train coming. but i can also tell when if there are some trains boarding.
+It get&rsquo;s more interesting if i go to the <a href="https://developer.wmata.com/docs/services/547636a6f9182302184cda78/operations/547636a6f918230da855363f">WMATA api documentation</a> and see what kind of information i can retrieve about each train:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;Trains&quot;</span><span class="p">:[</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                <span class="nt">&quot;Car&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;Destination&quot;</span><span class="p">:</span><span class="s2">&quot;SilvrSpg&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;DestinationCode&quot;</span><span class="p">:</span><span class="s2">&quot;B08&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;DestinationName&quot;</span><span class="p">:</span><span class="s2">&quot;Silver Spring&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;Group&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;Line&quot;</span><span class="p">:</span><span class="s2">&quot;RD&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;LocationCode&quot;</span><span class="p">:</span><span class="s2">&quot;A01&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;LocationName&quot;</span><span class="p">:</span><span class="s2">&quot;Metro Center&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="nt">&quot;Min&quot;</span><span class="p">:</span><span class="s2">&quot;3&quot;</span>
+</span><span class='line'>                <span class="p">},</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'><span class="err">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>mmm, i can get how many cars the train has and more importantly it&rsquo;s direction.
+What if i try to track the trains movement on a specific line, would i be able to determine where the trains are in real time? This is the problem i would try to resolve in this post.</p>
+
+<h2>Step 1 : Get the stations code</h2>
+
+<p>Given the information provided earlier, we need to find out where all the trains are in a specific line. In order to achieve that we need to make the <code>GetPrediction</code> on each station, The only problem is that we need a list of station codes to do that. Fortunately, we can use the <code>jPath</code> that will return all the stations between  a <code>FromStationCode</code> and a <code>ToStationCode</code>. So let&rsquo;s try to find all these stations code first.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;ruby_wmata&#39;</span>
+</span><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="s1">&#39;kfgpmgvfgacx98de9q3xazww&#39;</span>
+</span><span class='line'><span class="c1">#pick just 9 stations for the demonstration</span>
+</span><span class='line'><span class="n">path</span> <span class="o">=</span> <span class="no">WMATA</span><span class="o">.</span><span class="n">train_path</span><span class="p">(</span><span class="s2">&quot;A01&quot;</span><span class="p">,</span><span class="s2">&quot;A15&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">path_by_code</span> <span class="o">=</span> <span class="vi">@path</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="n">station</span><span class="o">|</span> <span class="n">station</span><span class="o">[</span><span class="s2">&quot;StationCode&quot;</span><span class="o">]</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 2 : Find where the trains are</h2>
+
+<p>Now that we have a list of train station codes, we can iterate through it then and make the next train API call. We will retrieve the list of all the arriving trains and sometime we will see that some trains are &ldquo;BRD&rdquo;, it would mean that the location of that train is the stations itself. So whenever we see that let&rsquo;s mark the stations with a &rsquo;T' to indicate the presence of a train and &lsquo;&mdash;&rsquo;  the absence of a trains .
+ So i want something that looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">## the first like would represent the 3 first letters of a station&#39;s name</span>
+</span><span class='line'><span class="mi">2015</span><span class="o">-</span><span class="mo">02</span><span class="o">-</span><span class="mi">28</span> <span class="mi">18</span><span class="p">:</span><span class="mo">04</span><span class="p">:</span><span class="mi">13</span> <span class="o">-</span><span class="mo">0500</span><span class="ss">:Met</span><span class="o">-</span><span class="no">Far</span><span class="o">-</span><span class="no">Dup</span><span class="o">-</span><span class="no">Woo</span><span class="o">-</span><span class="no">Cle</span><span class="o">-</span><span class="no">Van</span><span class="o">-</span><span class="no">Ten</span><span class="o">-</span><span class="no">Fri</span><span class="o">-</span><span class="no">Bet</span>
+</span><span class='line'><span class="mi">2015</span><span class="o">-</span><span class="mo">02</span><span class="o">-</span><span class="mi">28</span> <span class="mi">18</span><span class="p">:</span><span class="mo">04</span><span class="p">:</span><span class="mi">14</span> <span class="o">-</span><span class="mo">0500</span><span class="ss">:-</span><span class="n">T</span><span class="o">---------------------------------</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Let&rsquo;s code it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">find_trains_in_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">path_with_trains</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>  <span class="n">path</span><span class="o">.</span><span class="n">each_with_index</span><span class="p">{</span><span class="o">|</span><span class="n">station</span><span class="p">,</span><span class="n">index</span><span class="o">|</span>
+</span><span class='line'>    <span class="k">begin</span>
+</span><span class='line'>      <span class="n">next_trains</span> <span class="o">=</span> <span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">train_boarding?</span><span class="p">(</span><span class="n">next_trains</span><span class="p">)</span> <span class="p">?</span> <span class="n">path_with_trains</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;-T-&quot;</span> <span class="p">:</span> <span class="n">path_with_trains</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;---&quot;</span>
+</span><span class='line'>    <span class="k">rescue</span>
+</span><span class='line'>      <span class="n">path_with_trains</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;---&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>   <span class="k">return</span> <span class="n">path_with_trains</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we are extracting information about each stations, let&rsquo;s implement the function <code>train_boarding</code> that will tell us if there is a train boarding on that station</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">train_boarding?</span><span class="p">(</span><span class="n">next_trains</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">next_trains</span><span class="o">.</span><span class="n">select</span><span class="p">{</span><span class="o">|</span><span class="n">train</span><span class="o">|</span> <span class="n">train</span><span class="o">[</span><span class="s1">&#39;Min&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;BRD&#39;</span><span class="p">}</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 3 : Update periodically the display to show trains position</h2>
+
+<p>Now that we have all the information we need on a specific time. let&rsquo;s try to update the display every 10s. Also we don&rsquo;t want to show the same information multiple time, so we won&rsquo;t refresh the display if the train are in the same positions.<br/>
+We can also add some colors to the display to make it more user friendly using the <code>colorize</code> gem. (we all know that User friendly in a terminal is not possible!! )</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="si">}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">blue</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="vi">@path</span><span class="o">.</span><span class="n">map</span><span class="p">{</span><span class="o">|</span><span class="n">station</span><span class="o">|</span> <span class="n">station</span><span class="o">[</span><span class="s2">&quot;StationName&quot;</span><span class="o">][</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="o">]</span><span class="si">}</span><span class="s2">.join(&#39;-&#39;)}&quot;</span><span class="o">.</span><span class="n">red</span>
+</span><span class='line'><span class="n">last_display</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'><span class="k">while</span> <span class="p">(</span><span class="kp">true</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>  <span class="nb">display</span> <span class="o">=</span> <span class="n">find_trains_in_path</span><span class="p">(</span><span class="vi">@path_by_code</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">unless</span> <span class="nb">display</span> <span class="o">==</span> <span class="n">last_display</span>
+</span><span class='line'>    <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="si">}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">blue</span>
+</span><span class='line'>    <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="nb">display</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="n">last_display</span> <span class="o">=</span> <span class="nb">display</span>
+</span><span class='line'>  <span class="nb">sleep</span> <span class="mi">10</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And here is the final result:</p>
+
+<p><img src="http://i.imgur.com/4WGpuMF.png" alt="enter image description here" /></p>
+
+<p>Obviously,  this implementation is not perfect. We can argue a couple of things
+ - We don&rsquo;t really see the direction of the trains
+ - What if there are 2 trains going to the opposite directions boarding, we are not showing that information
+ - We could replace the last display by the current one but you would not see the movement of the trains
+ - We don&rsquo;t show the train when it is between two stations.</p>
+
+<h2>Conclusion</h2>
+
+<p>We came a long way form knowing the next train in a train station to display a whole line with the trains moving in realtime. This method could be implement for any other public transportation with a decent API . The most obvious one would be the next bus.
+We can also extend this project to make have a full map with more than one line and see all the train moving in realtime using Javascript and HTML/CSS.Who knows maybe my next project!</p>
+
+<p>You can find the source code for this project <a href="https://github.com/bennacer860/fun_with_trains">here</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafik Bennacer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T20:47:14-05:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train/" data-via="" data-counturl="http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/26/activerecord-dirty-change/" title="Previous Post: ActiveRecord dirty change">&laquo; ActiveRecord dirty change</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/03/15/coalesce/" title="Next Post: Coalesce">Coalesce &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/15/coalesce/">Coalesce</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/28/fun-with-next-train/">Fun with next train</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/26/activerecord-dirty-change/">ActiveRecord dirty change</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/17/rspec-internals-part-1/">Rspec internals (part 1)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/">Create your first API wrapper with TDD</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rafik Bennacer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'roadtomastery';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train/';
+        var disqus_url = 'http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
