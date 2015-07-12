@@ -7,8 +7,6 @@ categories:
 ---
 
 
-
-
 Today, After chatting with my colleague and try to fix some [ActiveRecord Store bug](http://api.rubyonrails.org/classes/ActiveRecord/Store.html), he showed me some very neat [ActiveRecord:Dirty](http://api.rubyonrails.org/classes/ActiveModel/Dirty.html) method called changed.
 
 I went to Rails documentation and found out the module that allows all this magic. It will tell you if anything has changed on the object.

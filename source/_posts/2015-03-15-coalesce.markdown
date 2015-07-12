@@ -1,0 +1,70 @@
+---
+layout: post
+title: "Coalesce"
+date: 2015-03-15 22:47:14 -0500
+comments: true
+categories: 
+---
+
+If you have never heard about the `coalesce` function, this will be very helpful.
+Basically this function exist in most modern DBMS and the definition reads, `The COALESCE function in SQL returns the first non-NULL expression among its arguments.` 
+
+let's see a simple example in postgres:
+
+```
+create table employees
+(
+        name text,
+        hourly_wage int,
+        salary int
+);
+
+insert into employees values 
+('bob',null,40000),
+('sam',40,null);
+```
+
+There are 2 ways to determine the annual salary, the first one is by displaying the the value of the salary field and the second one is by calculating that salary from the hourly wage. The problem is that sometimes on of the value is null so we would need a conditional, this is where the `coalesce` function enter into play. 
+
+Let's write a query that will display the annual salary regardless of the `null` values.
+
+`select coalesce(hourly_wage*40*52 ,salary) as  "total salary" from employees;`
+
+
+
+```
+ total salary 
+--------------
+40000
+83200
+(2 rows)
+```
+
+Perfect,  we are having the result we want without using a `case` statement.
+Now, I am wondering what would happen if both of the values where null, let's try it out:
+
+```
+insert into employees values ('jim',null,null);
+select coalesce(hourly_wage*40*52 ,salary) as  "total salary" from employees;
+
+total salary
+--------------
+        40000
+        83200
+             
+(3 rows)
+```
+
+Ok, So if both of the parameters are null then it will return null. However there is a way around it and it is adding another parameter at the end of the parameter list that will be the default , something like this `coalesce(ex1,ex2,default_value)`. Here is an example with the previous case:
+
+```
+select coalesce(hourly_wage*40*52 ,salary,0) as  "total salary" from employee;
+ total salary 
+--------------
+        40000
+        83200
+            0
+(3 rows)
+
+```
+
