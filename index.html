@@ -237,7 +237,7 @@
 
 <p>This code is largely inspired from <a href="">Amit Agarwal</a> code.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -338,107 +338,108 @@
 <span class='line-number'>99</span>
 <span class='line-number'>100</span>
 <span class='line-number'>101</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>function Start() {
-</span><span class='line'>  
-</span><span class='line'>  
-</span><span class='line'>  var files = DriveApp.getFiles();  
-</span><span class='line'>  var timezone = Session.getScriptTimeZone();
-</span><span class='line'>  var email = Session.getActiveUser().getEmail();
-</span><span class='line'>  
-</span><span class='line'>  var MAXFILES = 300; count=1;
-</span><span class='line'>  var file, date, access, url, permission;
-</span><span class='line'>  var privacy, view, viewers, edit, editors;
-</span><span class='line'>  
-</span><span class='line'>  var rows = [["File Name", "Who has access?", "Date Created"]];
-</span><span class='line'>  
-</span><span class='line'>  for (var i=0; i&lt;MAXFILES && files.hasNext(); i++ ) {
-</span><span class='line'>    
-</span><span class='line'>    file = files.next();
-</span><span class='line'>    
-</span><span class='line'>    try {
-</span><span class='line'>      
-</span><span class='line'>      access     = file.getSharingAccess();
-</span><span class='line'>      permission = file.getSharingPermission();
-</span><span class='line'>      viewers    = file.getViewers();      
-</span><span class='line'>      editors    = file.getEditors();
-</span><span class='line'>      
-</span><span class='line'>      view = [];
-</span><span class='line'>      edit = [];
-</span><span class='line'>      
-</span><span class='line'>      date =  Utilities.formatDate(file.getDateCreated(), timezone, "yyyy-MM-dd HH:mm")
-</span><span class='line'>      url = count++ + '. &lt;a href="' + file.getUrl() + '"&gt;' + file.getName() + '&lt;/a&gt;';
-</span><span class='line'>      
-</span><span class='line'>      for (var v=0; v&lt;viewers.length; v++) {                
-</span><span class='line'>        view.push(viewers[v].getName() + " " + viewers[v].getEmail());
-</span><span class='line'>      }
-</span><span class='line'>      
-</span><span class='line'>      for (var ed=0; ed&lt;editors.length; ed++) {                
-</span><span class='line'>        edit.push(editors[ed].getName() + " " + editors[ed].getEmail());
-</span><span class='line'>      }
-</span><span class='line'>      
-</span><span class='line'>      switch(access) {
-</span><span class='line'>        case DriveApp.Access.PRIVATE:
-</span><span class='line'>          privacy = "Private";
-</span><span class='line'>          break;
-</span><span class='line'>        case DriveApp.Access.ANYONE:
-</span><span class='line'>          privacy = "Anyone";
-</span><span class='line'>          break;
-</span><span class='line'>        case DriveApp.Access.ANYONE_WITH_LINK:
-</span><span class='line'>          privacy = "Anyone with a link";
-</span><span class='line'>          break;
-</span><span class='line'>        case DriveApp.Access.DOMAIN:
-</span><span class='line'>          privacy = "Anyone inside domain";
-</span><span class='line'>          break;
-</span><span class='line'>        case DriveApp.Access.DOMAIN_WITH_LINK:
-</span><span class='line'>          privacy = "Anyone inside domain who has the link";
-</span><span class='line'>          break;
-</span><span class='line'>        default:
-</span><span class='line'>          privacy = "Unknown";
-</span><span class='line'>      }
-</span><span class='line'>      
-</span><span class='line'>      switch(permission) {
-</span><span class='line'>        case DriveApp.Permission.COMMENT:
-</span><span class='line'>          permission = "can comment";
-</span><span class='line'>          break;
-</span><span class='line'>        case DriveApp.Permission.VIEW:
-</span><span class='line'>          permission = "can view";
-</span><span class='line'>          break;
-</span><span class='line'>        case DriveApp.Permission.EDIT:
-</span><span class='line'>          permission = "can edit";
-</span><span class='line'>          break;
-</span><span class='line'>        default:
-</span><span class='line'>          permission = "";
-</span><span class='line'>      }
-</span><span class='line'>      
-</span><span class='line'>      view = view.join(", ");
-</span><span class='line'>            
-</span><span class='line'>      edit = edit.join(", ");
-</span><span class='line'>            
-</span><span class='line'>      privacy += (permission === "" ? "" : " " + permission) 
-</span><span class='line'>               + (edit === "" ? "" : "&lt;br&gt;&lt;small&gt;" + edit + " can edit&lt;/small&gt;")
-</span><span class='line'>               + (view === "" ? "" : "&lt;br&gt;&lt;small&gt;" + view + " can view&lt;/small&gt;")
-</span><span class='line'>      
-</span><span class='line'>      rows.push([url, privacy, date]);
-</span><span class='line'>      
-</span><span class='line'>    } catch (e) {Logger.log(e.toString()); Logger.log(file.getName());};
-</span><span class='line'>    
-</span><span class='line'>  }
-</span><span class='line'>  
-</span><span class='line'>  var html = "&lt;p style='text-align:center'&gt;&lt;strong&gt;&lt;a style='font-size:160%;text-decoration:none;color:#49B3F5;' File Permissions Report for Google Drive&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;";
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Start</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>
 </span><span class='line'>
-</span><span class='line'>  html += "&lt;table border='1' cellpadding='5' cellspacing='0'&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;" + rows[0].join("&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;") + "&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;";
-</span><span class='line'>  
-</span><span class='line'>  for (var i=1; i&lt;rows.length; i++) {
-</span><span class='line'>    html += "&lt;tr&gt;&lt;td&gt;" + rows[i].join("&lt;/td&gt;&lt;td&gt;") + "&lt;/td&gt;&lt;/tr&gt;";
-</span><span class='line'>  }
-</span><span class='line'>  
-</span><span class='line'>  html += "&lt;/table&gt;";
-</span><span class='line'>  
-</span><span class='line'>  
-</span><span class='line'>  GmailApp.sendEmail(email, "Google Drive - File Permissions Report", "", {htmlBody: html});
-</span><span class='line'>  
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">files</span> <span class="o">=</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">getFiles</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">timezone</span> <span class="o">=</span> <span class="nx">Session</span><span class="p">.</span><span class="nx">getScriptTimeZone</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">email</span> <span class="o">=</span> <span class="nx">Session</span><span class="p">.</span><span class="nx">getActiveUser</span><span class="p">().</span><span class="nx">getEmail</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">MAXFILES</span> <span class="o">=</span> <span class="mi">300</span><span class="p">;</span> <span class="nx">count</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">file</span><span class="p">,</span> <span class="nx">date</span><span class="p">,</span> <span class="nx">access</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="nx">permission</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">privacy</span><span class="p">,</span> <span class="nx">view</span><span class="p">,</span> <span class="nx">viewers</span><span class="p">,</span> <span class="nx">edit</span><span class="p">,</span> <span class="nx">editors</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">rows</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;File Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Who has access?&quot;</span><span class="p">,</span> <span class="s2">&quot;Date Created&quot;</span><span class="p">]];</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">MAXFILES</span> <span class="o">&amp;&amp;</span> <span class="nx">files</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">();</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">file</span> <span class="o">=</span> <span class="nx">files</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">access</span>     <span class="o">=</span> <span class="nx">file</span><span class="p">.</span><span class="nx">getSharingAccess</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">permission</span> <span class="o">=</span> <span class="nx">file</span><span class="p">.</span><span class="nx">getSharingPermission</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">viewers</span>    <span class="o">=</span> <span class="nx">file</span><span class="p">.</span><span class="nx">getViewers</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">editors</span>    <span class="o">=</span> <span class="nx">file</span><span class="p">.</span><span class="nx">getEditors</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">view</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>      <span class="nx">edit</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">date</span> <span class="o">=</span>  <span class="nx">Utilities</span><span class="p">.</span><span class="nx">formatDate</span><span class="p">(</span><span class="nx">file</span><span class="p">.</span><span class="nx">getDateCreated</span><span class="p">(),</span> <span class="nx">timezone</span><span class="p">,</span> <span class="s2">&quot;yyyy-MM-dd HH:mm&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="nx">url</span> <span class="o">=</span> <span class="nx">count</span><span class="o">++</span> <span class="o">+</span> <span class="s1">&#39;. &lt;a href=&quot;&#39;</span> <span class="o">+</span> <span class="nx">file</span><span class="p">.</span><span class="nx">getUrl</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;&#39;</span> <span class="o">+</span> <span class="nx">file</span><span class="p">.</span><span class="nx">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;&lt;/a&gt;&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">v</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">v</span><span class="o">&lt;</span><span class="nx">viewers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">v</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">view</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">viewers</span><span class="p">[</span><span class="nx">v</span><span class="p">].</span><span class="nx">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">viewers</span><span class="p">[</span><span class="nx">v</span><span class="p">].</span><span class="nx">getEmail</span><span class="p">());</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">ed</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">ed</span><span class="o">&lt;</span><span class="nx">editors</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">ed</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">edit</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">editors</span><span class="p">[</span><span class="nx">ed</span><span class="p">].</span><span class="nx">getName</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">editors</span><span class="p">[</span><span class="nx">ed</span><span class="p">].</span><span class="nx">getEmail</span><span class="p">());</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">switch</span><span class="p">(</span><span class="nx">access</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Access</span><span class="p">.</span><span class="nx">PRIVATE</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">privacy</span> <span class="o">=</span> <span class="s2">&quot;Private&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Access</span><span class="p">.</span><span class="nx">ANYONE</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">privacy</span> <span class="o">=</span> <span class="s2">&quot;Anyone&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Access</span><span class="p">.</span><span class="nx">ANYONE_WITH_LINK</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">privacy</span> <span class="o">=</span> <span class="s2">&quot;Anyone with a link&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Access</span><span class="p">.</span><span class="nx">DOMAIN</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">privacy</span> <span class="o">=</span> <span class="s2">&quot;Anyone inside domain&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Access</span><span class="p">.</span><span class="nx">DOMAIN_WITH_LINK</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">privacy</span> <span class="o">=</span> <span class="s2">&quot;Anyone inside domain who has the link&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">privacy</span> <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">switch</span><span class="p">(</span><span class="nx">permission</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Permission</span><span class="p">.</span><span class="nx">COMMENT</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">permission</span> <span class="o">=</span> <span class="s2">&quot;can comment&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Permission</span><span class="p">.</span><span class="nx">VIEW</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">permission</span> <span class="o">=</span> <span class="s2">&quot;can view&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="nx">DriveApp</span><span class="p">.</span><span class="nx">Permission</span><span class="p">.</span><span class="nx">EDIT</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">permission</span> <span class="o">=</span> <span class="s2">&quot;can edit&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>          <span class="nx">permission</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">view</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">edit</span> <span class="o">=</span> <span class="nx">edit</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">privacy</span> <span class="o">+=</span> <span class="p">(</span><span class="nx">permission</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span> <span class="o">?</span> <span class="s2">&quot;&quot;</span> <span class="o">:</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">permission</span><span class="p">)</span>
+</span><span class='line'>               <span class="o">+</span> <span class="p">(</span><span class="nx">edit</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span> <span class="o">?</span> <span class="s2">&quot;&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;br&gt;&lt;small&gt;&quot;</span> <span class="o">+</span> <span class="nx">edit</span> <span class="o">+</span> <span class="s2">&quot; can edit&lt;/small&gt;&quot;</span><span class="p">)</span>
+</span><span class='line'>               <span class="o">+</span> <span class="p">(</span><span class="nx">view</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span> <span class="o">?</span> <span class="s2">&quot;&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;br&gt;&lt;small&gt;&quot;</span> <span class="o">+</span> <span class="nx">view</span> <span class="o">+</span> <span class="s2">&quot; can view&lt;/small&gt;&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">rows</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">url</span><span class="p">,</span> <span class="nx">privacy</span><span class="p">,</span> <span class="nx">date</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span><span class="nx">Logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="nx">Logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">file</span><span class="p">.</span><span class="nx">getName</span><span class="p">());};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;p style=&#39;text-align:center&#39;&gt;&lt;strong&gt;&lt;a style=&#39;font-size:160%;text-decoration:none;color:#49B3F5;&#39; File Permissions Report for Google Drive&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;table border=&#39;1&#39; cellpadding=&#39;5&#39; cellspacing=&#39;0&#39;&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;&quot;</span> <span class="o">+</span> <span class="nx">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;b&gt;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;tr&gt;&lt;td&gt;&quot;</span> <span class="o">+</span> <span class="nx">rows</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;&lt;/td&gt;&lt;td&gt;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">GmailApp</span><span class="p">.</span><span class="nx">sendEmail</span><span class="p">(</span><span class="nx">email</span><span class="p">,</span> <span class="s2">&quot;Google Drive - File Permissions Report&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">htmlBody</span><span class="o">:</span> <span class="nx">html</span><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 </div>
   
