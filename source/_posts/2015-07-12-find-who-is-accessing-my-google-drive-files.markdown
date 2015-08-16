@@ -17,7 +17,7 @@ Since i like Ruby programming i thought about using the Google Drive API to acco
 After looking at [Google Script overview page](https://developers.google.com/apps-script/overview) i realized that this is going to be fairly easy to solve an amazing complex problem. Google Script use a language based on Javascript and this [API doc](https://developers.google.com/apps-script/reference/calendar/).
 
 This code is largely inspired from [Amit Agarwal]() code.
-```
+```javascript
 function Start() {
   
   
