@@ -9,7 +9,7 @@
   <meta name="author" content="Rafik Bennacer">
 
   
-  <meta name="description" content="I Recently had to share some documents from my Google Drive with a team of developers outside the office. Most of these documents were API docs. &hellip;">
+  <meta name="description" content="Rails challenge A couple of months ago I stumbled on a reddit post talking about a Rails challenge. I accepted the challenge and finished it with no &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,6 +81,119 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/">My Experience From Railschallenge.com</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-08-16T18:13:16-04:00" pubdate data-updated="true"></time>
+        
+         | <a href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Rails challenge</h1>
+
+<p>A couple of months ago I stumbled on a reddit post talking about a <a href="http://railschallenge.com/">Rails challenge</a>. I accepted the challenge and finished it with no error. In this blog i would try to share what i learned form that experience.</p>
+
+<h1>Rubocop</h1>
+
+<p>It was my first time using Rubocop and it was life changing. For those who don&rsquo;t know Rubocop, It is a static code analyser that would use the Ruby community outline and give you the list of offenses you have in your code. An example would be use <code>&amp;&amp;</code> instead of <code>and</code> (more information <a href="http://devblog.avdi.org/2010/08/02/using-and-and-or-in-ruby/">here</a>).</p>
+
+<h1>Serializers</h1>
+
+<p>I started by parsing my own JSON data structure and then i realized that it is getting too complicated to i used <a href="https://github.com/rails-api/active_model_serializers">ActiveModel::Serializer</a>. Serializers describe which attributes and relationships should be serialized. Adapters describe how attributes and relationships should be serialized.</p>
+
+<p>One thing i struggled with was raising an expection when unpermitted parameters were used. I wasted tremendous amount of implementing that fuctionality instead of using the <code>config.action_controller.action_on_unpermitted_parameters = :raise</code></p>
+
+<h1>The Dispatcher algorithm</h1>
+
+<p>This was supposed to be the most complicated part of the challenge. After refining my algorithm a couple of times i realized that i could pass the test using this basic logic. I would order the <code>capacacity</code> of the <code>responder</code> by increasing order i would just assign available responder until in don&rsquo;t have anymore or until i responded fully to the emergency need. It would look like this.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">dispatch</span>
+</span><span class='line'>    <span class="no">RESPONDER_TYPE</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="o">|</span>
+</span><span class='line'>      <span class="c1"># find a responder on duty and available that can handle the emergency on his own</span>
+</span><span class='line'>      <span class="n">responder</span> <span class="o">=</span> <span class="no">Responder</span><span class="o">.</span><span class="n">by_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">on_duty</span><span class="o">.</span><span class="n">available</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s2">&quot;capacity = ?&quot;</span><span class="p">,</span> <span class="nb">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+</span><span class='line'>      <span class="c1"># see if we ahve an exact match</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">responder</span><span class="o">.</span><span class="n">count</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span class='line'>        <span class="nb">self</span><span class="o">.</span><span class="n">responders</span> <span class="o">&lt;&lt;</span> <span class="n">responder</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="c1"># if there is no exact match add resources until it is enough for the emergency severity</span>
+</span><span class='line'>        <span class="n">add_resource</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="nb">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">fully_responded</span> <span class="o">=</span> <span class="kp">true</span> <span class="k">if</span> <span class="nb">self</span><span class="o">.</span><span class="n">enough_resources?</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">add_resource</span><span class="p">(</span><span class="n">type</span><span class="p">,</span><span class="n">severity</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">responders_by_type</span> <span class="o">=</span> <span class="no">Responder</span><span class="o">.</span><span class="n">by_type</span><span class="p">(</span><span class="n">type</span><span class="p">)</span><span class="o">.</span><span class="n">on_duty</span><span class="o">.</span><span class="n">available</span><span class="o">.</span><span class="n">order</span><span class="p">(</span><span class="ss">capacity</span><span class="p">:</span> <span class="ss">:desc</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">responder_severity_sum</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="n">responder_list</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>    <span class="n">responders_by_type</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">responder</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="n">responder_severity_sum</span> <span class="o">&lt;</span> <span class="n">severity</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">responder_severity_sum</span> <span class="o">+=</span> <span class="n">responder</span><span class="o">.</span><span class="n">capacity</span>
+</span><span class='line'>        <span class="nb">self</span><span class="o">.</span><span class="n">responders</span> <span class="o">&lt;&lt;</span> <span class="n">responder</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Conclusion</h1>
+
+<p>I really enjoyed working on this challenge. My only regret was not doing it before the deadline because they were going through your solution and grade it. I heard they will have other challenges soon, so stay tuned!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1539,6 +1652,10 @@ We can also extend this project to make have a full map with more than one line 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/">My experience from Railschallenge.com</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/">Find Who is Accessing my Google Drive Files</a>
       </li>
     
@@ -1552,10 +1669,6 @@ We can also extend this project to make have a full map with more than one line 
     
       <li class="post">
         <a href="/blog/2015/02/28/fun-with-next-train/">Fun with next train</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/26/activerecord-dirty-change/">ActiveRecord dirty change</a>
       </li>
     
   </ul>

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://bennacer860.github.io/blog/2015/08/16/my-experience-from-railschallenge-dot-com/</loc>
+    <lastmod>2015-08-16T18:13:16-04:00</lastmod>
+  </url>
+  <url>
     <loc>http://bennacer860.github.io/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/</loc>
     <lastmod>2015-07-12T15:20:15-04:00</lastmod>
   </url>
