@@ -51,4 +51,4 @@ def dispatch
 ```
 
 #Conclusion
-I really enjoyed working on this challenge. My only regret was not doing it before the deadline because they were going through your solution and grade it. I heard they will have other challenges soon, so stay tuned!
+I really enjoyed working on this challenge and here is [my solution](https://github.com/bennacer860/railschallenge-city-watch). My only regret was not doing it before the deadline because they were going through your solution and grade it. I heard they will have other challenges soon, so stay tuned!
