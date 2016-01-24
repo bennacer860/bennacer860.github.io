@@ -86,7 +86,7 @@ Comparison:
 ```
 
 # Conclusion
-Once you see how it works, it would seem very natural to implement these methods to solve a certain class of problems. Whenever you see recursion you might have a chance to optimize your code using Dynamic programming.
+Once you see how it works, it would seem very natural to implement these methods to solve a certain class of problems. Whenever you see recursion you might have a chance to optimize your code using Dynamic Programming.
 
 
 
