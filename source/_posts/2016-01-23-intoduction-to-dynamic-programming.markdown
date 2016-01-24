@@ -20,7 +20,7 @@ In this post we will try to solve a very common problem (fibonacci sequence) in 
 ## The Recusive way
 This is the recursive way to solve it:
 
-```
+```ruby
 def fib n
     return 0 if n == 0
     return 1 if (n == 1 || n == 2)
@@ -47,7 +47,7 @@ It seems a little bit confusing at first (That's recursion in general), but what
 Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called [memoisation](), Let's try to do so. in our example the intermediate solution could be fib(3) so let's store it in an array so we don't have to re caluculate it. And let's do this for all the other number.
 Here is what the solution look like.
 
-```
+```ruby
 def dynamic_fib n
   fibonacci = Array.new
   fibonacci[0] = 0
@@ -60,7 +60,7 @@ end
 ```
 This solution looks much more efficient, it will find the fibonacci sequenece with `n` complexity. Let's try to benchmark it though:
 
-```
+```ruby
 require 'benchmark/ips'
 
 Benchmark.ips do |x|
@@ -75,7 +75,8 @@ Benchmark.ips do |x|
 end
 ```
 
-```Calculating -------------------------------------
+```
+Calculating -------------------------------------
     recursive fib 30     1.234k i/100ms
       dynamic fib 30    40.252k i/100ms
 -------------------------------------------------
