@@ -6,9 +6,6 @@ comments: true
 categories: 
 ---
 
-
-# Introduction Dynamic Programming
-
 As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve them if you don't use dynamic programming techniques. I know it sounds very tounting and fency but Dynamic programming is not. It is not as elegant as Recusion and require most of the time additional data structure to solve intermediate solutions. 
 
 Wikipedia has a better definition than me and it is the folowing: `dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure`. 
