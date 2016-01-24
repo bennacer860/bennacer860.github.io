@@ -41,7 +41,7 @@ It seems a little bit confusing at first (That's recursion in general), but what
 
 ## The Dynamic programming way
 
-Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called [memoisation](https://en.wikipedia.org/wiki/Memoization), Let's try to do so. in our example the intermediate solution could be fib(3) so let's store it in an array so we don't have to re caluculate it. And let's do this for all the other number.
+Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called [Memoization](https://en.wikipedia.org/wiki/Memoization), Let's try to do so. in our example the intermediate solution could be fib(3) so let's store it in an array so we don't have to re caluculate it. And let's do this for all the other number.
 Here is what the solution look like.
 
 ```ruby
