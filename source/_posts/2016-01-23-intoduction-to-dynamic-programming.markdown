@@ -6,13 +6,13 @@ comments: true
 categories: 
 ---
 
-As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve them if you don't use dynamic programming techniques. I know it sounds very tounting and fency but Dynamic programming is not. It is not as elegant as Recusion and require most of the time additional data structure to solve intermediate solutions. 
+As a big fan of programming puzzles, I realized that the harder the problems get, the less equipped you are to solve them if you don't use dynamic programming techniques. I know it sounds very taunting and fancy but Dynamic programming is not. It is not as elegant as Recursion and requires additional data structure to solve intermediate solutions most of the time.
 
-Wikipedia has a better definition than me and it is the folowing: `dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure`. 
+Wikipedia has a better as follows: `dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure`.
 
-This is very iteresting. As software developer, don't we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? No so sure.
+This definition is very interesting. As a software developer, don't we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? Not so sure.
 
-In this post we will try to solve a very common problem (fibonacci sequence) in two ways and comment on how the methods of dynamic programming are more efficient.
+In this post we will try to solve a very common problem (ie Fibonacci Sequence) in two ways and demonstrate on how the methods of dynamic programming can be more efficient.
 
 ## The Recusive way
 This is the recursive way to solve it:
@@ -25,7 +25,7 @@ def fib n
 end
 ```
 
-let see how ```fib(4)``` is calculated:
+let's see how ```fib(4)``` is calculated:
 
 ```
 fib(5) =          fib(4)            +     fib(3)
@@ -37,12 +37,12 @@ fib(5) =          fib(4)            +     fib(3)
               |       |
               1       1
 ```
-It seems a little bit confusing at first (That's recursion in general), but what i want you to notice is that we are solving the same problems over and over again. For example fib(2) is solved twice. You can imagine how trying to calculate the fibonacci sequence of a big number could result in a large amount of time. It takes 2-3 min to find the 50th term!
+It seems a bit confusing at first (that's recursion in general), but what I want you to notice is that we are solving the same problems over and over again. For example, fib(2) is solved twice. You can imagine how trying to calculate the Fibonacci sequence of a big number could result in a large amount of time. It acutally takes 2-3 minutes to find the 50th term!
 
 ## The Dynamic programming way
 
-Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called [Memoization](https://en.wikipedia.org/wiki/Memoization), Let's try to do so. in our example the intermediate solution could be fib(3) so let's store it in an array so we don't have to re caluculate it. And let's do this for all the other number.
-Here is what the solution look like.
+Since the topic is Dynamic Programming and it is all breaking down the complex problems to simpler ones and storing their solution, this is called [Memoization](https://en.wikipedia.org/wiki/Memoization) by the way. Let's try this. In our example the intermediate solution could be fib(3), so let's store it in an array so we don't have to recalculate it, And let's do this for all the other numbers.
+Here is what the solution should look like:
 
 ```ruby
 def dynamic_fib n
@@ -55,7 +55,7 @@ def dynamic_fib n
   fibonacci[n]
 end
 ```
-This solution looks much more efficient, it will find the fibonacci sequenece with `n` complexity. Let's try to benchmark it though:
+This solution looks more efficient, it will find the Fibonacci Sequence with `n` complexity. Let's benchmark it though:
 
 ```ruby
 require 'benchmark/ips'
@@ -85,10 +85,8 @@ Comparison:
     recursive fib 30:    12357.8 i/s - 39.62x slower
 ```
 
-
 # Conclusion
-
-Once you see how ti would, it would seem very natural to implement these methods to solve certain class of problems. Whenever you see recusion you might have a chance to optimize your code using Dynamic programming.
+Once you see how it works, it would seem very natural to implement these methods to solve a certain class of problems. Whenever you see recursion you might have a chance to optimize your code using Dynamic programming.
 
 
 
