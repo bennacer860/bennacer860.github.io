@@ -151,7 +151,7 @@ end
 When you run the tests now, everything should be green. This part makes sure that our code handles correctly the expected response, now let's make a live API call :
 
 ```ruby
-WMATA.api_key = "kfgpmgvfgacx98de9q3xazww"
+WMATA.api = "kfgpmgvfgacx98de9q3xazww"
 WMATA.next_trains("A01") # A01 stands for a station code
 ```
 
