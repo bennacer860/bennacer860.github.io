@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Intoduction to Dynamic Programming - The Road To Mastery</title>
+  <meta name="author" content="Rafik Bennacer">
+
+  
+  <meta name="description" content="Introduction Dynamic Programming As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="The Road To Mastery" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12142135-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">The Road To Mastery</a></h1>
+  
+    <h2>From Ruby intermediate to Master...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:bennacer860.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Intoduction to Dynamic Programming</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-23T22:16:49-05:00" pubdate data-updated="true"></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>Introduction Dynamic Programming</h1>
+
+<p>As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use dynamic programming techniques. I know it sounds very tounting and fency but Dynamic programming is not. It is not as elegant as Recusion and require most of the time additional data structure to solve intermediate solutions.</p>
+
+<p>Wikipedia has a better definition than me and it is the folowing: <code>dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure</code>.</p>
+
+<p>This is very iteresting. As software developer, don&rsquo;t we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? No so sure.</p>
+
+<p>In this post we will try to solve a very common problem (fibonacci sequence) in two ways and comment on how the methods of dynamic programming are more efficient.</p>
+
+<h2>The Recusive way</h2>
+
+<p>This is the recursive way to solve it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">fib</span> <span class="n">n</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>let see how <code>fib(4)</code> is calculated:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">fib</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">=</span>          <span class="n">fib</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>            <span class="o">+</span>     <span class="n">fib</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>                    <span class="o">|</span>                        <span class="o">|</span>
+</span><span class='line'>            <span class="n">fib</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="o">+</span>  <span class="n">fib</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>          <span class="n">fib</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>              <span class="o">|</span>          <span class="o">|</span>               <span class="o">|</span>        <span class="o">|</span>
+</span><span class='line'>              <span class="o">|</span>          <span class="mi">1</span>               <span class="mi">1</span>        <span class="mi">1</span>
+</span><span class='line'>            <span class="n">fib</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>              <span class="o">|</span>       <span class="o">|</span>
+</span><span class='line'>              <span class="mi">1</span>       <span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It seems a little bit confusing at first (That&rsquo;s recursion in general), but what i want you to notice is that we are solving the same problems over and over again. For example fib(2) is solved twice. You can imagine how trying to calculate the fibonacci sequence of a big number could result in a large amount of time. It takes 2-3 min to find the 50th term!</p>
+
+<h2>The Dynamic programming way</h2>
+
+<p>Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called <a href="">memoisation</a>, Let&rsquo;s try to do so. in our example the intermediate solution could be fib(3) so let&rsquo;s store it in an array so we don&rsquo;t have to re caluculate it. And let&rsquo;s do this for all the other number.
+Here is what the solution look like.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">dynamic_fib</span> <span class="n">n</span>
+</span><span class='line'>  <span class="n">fibonacci</span> <span class="o">=</span> <span class="nb">Array</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="n">fibonacci</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="n">fibonacci</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="n">fibonacci</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">index</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">fibonacci</span><span class="o">[</span><span class="n">index</span><span class="o">]</span> <span class="o">=</span> <span class="n">fibonacci</span><span class="o">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="o">]+</span><span class="n">fibonacci</span><span class="o">[</span><span class="n">index</span><span class="o">-</span><span class="mi">2</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="n">fibonacci</span><span class="o">[</span><span class="n">n</span><span class="o">]</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This solution looks much more efficient, it will find the fibonacci sequenece with <code>n</code> complexity. Let&rsquo;s try to benchmark it though:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;benchmark/ips&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Benchmark</span><span class="o">.</span><span class="n">ips</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">x</span><span class="o">.</span><span class="n">report</span> <span class="s1">&#39;recursive fib 30&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">fib</span> <span class="mi">30</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">x</span><span class="o">.</span><span class="n">report</span> <span class="s1">&#39;dynamic fib 30&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">dynamic_fib</span> <span class="mi">30</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="n">x</span><span class="o">.</span><span class="n">compare!</span> <span class="c1"># Print the comparison</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Calculating</span> <span class="o">-------------------------------------</span>
+</span><span class='line'>    <span class="n">recursive</span> <span class="n">fib</span> <span class="mi">30</span>     <span class="mi">1</span><span class="o">.</span><span class="mi">234</span><span class="n">k</span> <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'>      <span class="n">dynamic</span> <span class="n">fib</span> <span class="mi">30</span>    <span class="mi">40</span><span class="o">.</span><span class="mi">252</span><span class="n">k</span> <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="o">-------------------------------------------------</span>
+</span><span class='line'>    <span class="n">recursive</span> <span class="n">fib</span> <span class="mi">30</span>     <span class="mi">12</span><span class="o">.</span><span class="mi">358</span><span class="n">k</span> <span class="p">(</span><span class="err">±</span> <span class="mi">3</span><span class="o">.</span><span class="mi">8</span><span class="sx">%) i/s -     62.934k</span>
+</span><span class='line'><span class="sx">      dynamic fib 30    489.616k (±10.1%)</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span>      <span class="mi">2</span><span class="o">.</span><span class="mi">455</span><span class="n">M</span>
+</span><span class='line'>
+</span><span class='line'><span class="ss">Comparison</span><span class="p">:</span>
+</span><span class='line'>      <span class="n">dynamic</span> <span class="n">fib</span> <span class="mi">30</span><span class="p">:</span>   <span class="mi">489616</span><span class="o">.</span><span class="mi">3</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span>
+</span><span class='line'>    <span class="n">recursive</span> <span class="n">fib</span> <span class="mi">30</span><span class="p">:</span>    <span class="mi">12357</span><span class="o">.</span><span class="mi">8</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span> <span class="mi">39</span><span class="o">.</span><span class="mi">62</span><span class="n">x</span> <span class="n">slower</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Conclusion</h1>
+
+<p>Once you see how ti would, it would seem very natural to implement these methods to solve certain class of problems. Whenever you see recusion you might have a chance to optimize your code using Dynamic programming.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafik Bennacer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-23T22:16:49-05:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/" data-via="" data-counturl="http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/" title="Previous Post: My experience from Railschallenge.com">&laquo; My experience from Railschallenge.com</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/01/23/intoduction-to-dynamic-programming/">Intoduction to Dynamic Programming</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/">My experience from Railschallenge.com</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/">Find Who is Accessing my Google Drive Files</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">Upgrade to the new Universal Analytics Syntax in SQL</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/15/coalesce/">Coalesce</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Rafik Bennacer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'roadtomastery';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/';
+        var disqus_url = 'http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
