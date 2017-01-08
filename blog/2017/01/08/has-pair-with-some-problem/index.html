@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>'Pair With Sum' Problem - The Road To Mastery</title>
+  <meta name="author" content="Rafik Bennacer">
+
+  
+  <meta name="description" content="Recently, I Have been researching common coding interview-problems and I&rsquo;ve discovered that most of the major tech companies like Google or &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="The Road To Mastery" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+
+
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12142135-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">The Road To Mastery</a></h1>
+  
+    <h2>From Ruby intermediate to Master...</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:bennacer860.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">'Pair With Sum' Problem</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-01-08T17:40:47-05:00" pubdate data-updated="true"></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Recently, I Have been researching common coding interview-problems and I&rsquo;ve discovered that most of the major tech companies like Google or facebook have overlapping problem lists. One of these problems is called <code>Pair With Sum</code> and it states the following <code>Find a pair of elements from an array whose sum equals a given number</code>.</p>
+
+<p>This request is a bit ambiguous - so let&rsquo;s start out by listing all the assumptions that we are making before we begin working on a solution:</p>
+
+<ul>
+<li> The array contains only integers</li>
+<li> The array can have duplicates</li>
+<li> Return a boolean that indicates if the list has such a pair</li>
+<li> We will start with an ordered (ascending order) list example</li>
+</ul>
+
+
+<h3>Brute force</h3>
+
+<p>Lets code the most naive solution. Basically, try every pair possible and see if their sum is equal to the given number. It would look like this in Ruby</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">has_pair_with_sum_brute_force</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">sum</span><span class="p">)</span>
+</span><span class='line'>  <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+</span><span class='line'>    <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">n</span><span class="o">]</span> <span class="o">==</span> <span class="n">sum</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">i</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kp">true</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kp">false</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This solution would work whether the list is sorted or not. However, this is an inefficient way of solving the problem, indicated by the complexity of this algorithm at O(n<sup>2</sup>). This will get out of control pretty quickly for large arrays. We need a solution that has a linear complexity or a O(n). Let&rsquo;s explore another solution where we assume that the array elemets are sorted.</p>
+
+<h3>Moving pointer</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">has_pair_with_sum_in_ordered_list</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">sum</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">pointer_begining</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="n">pointer_end</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">while</span><span class="p">(</span><span class="n">pointer_begining</span> <span class="o">&lt;</span> <span class="n">pointer_end</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># puts pointer_begining</span>
+</span><span class='line'>    <span class="c1"># puts pointer_end</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kp">true</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_begining</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_end</span><span class="o">]</span> <span class="o">==</span> <span class="n">sum</span>
+</span><span class='line'>    <span class="n">pointer_end</span> <span class="o">-=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_begining</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_end</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">sum</span>
+</span><span class='line'>    <span class="n">pointer_begining</span> <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_begining</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_end</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">sum</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kp">false</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This solution has the algorithm complexity of O(n) we are looking for, making it much more scalable and efficient. Let&rsquo;s go over the solution briefly. We have one pointer at the begining of the array and one at the end. we sum the value pointed with the two pointer</p>
+
+<ul>
+<li> If the sum is equal to the given number then we have found a solution</li>
+<li> If the sum is greater than the given number then the sum is too big, so we move the last pointer to the value before it</li>
+<li> If the sum is smaller than the given number then the sum is too small so we move the last pointer to the value after it</li>
+</ul>
+
+
+<h3>Saving the Complement</h3>
+
+<p>Imagine now that our list is not ordered, In this case, the previous method would not work. We need to come up with another algorithm with a linear complexity to retain our scalability. We note that in order for us to determine if a number has a pair, that the sum would equal to the given number, it needs to have its complement in the array. Let&rsquo;s assume that the first element of the array is 2 and that the given number is 8- the complement of 2 to make 8 is <code>8-2=6</code>. If we find 6 in the array, we know that it represents a valid pair.</p>
+
+<p>Here&rsquo;s an example:</p>
+
+<p><code>array = [1,3,2],  given_number = 4</code></p>
+
+<p>Let&rsquo;s go through this array and save the complements in some data structure. The ideal data structure in this case would be some kind of hash that would save only keys. The reason why we would choose this data structure is because it will ensure our collection constantly maintains unique elements (no redundancy) and it will do the element look up in a constant complexity O(1). In Ruby we can use the <a href="http://ruby-doc.org/stdlib-2.3.3/libdoc/set/rdoc/Set.html">Set</a> library.</p>
+
+<p>Back to our array traversal. The first element is 1, its complement is (4-1=3), let&rsquo;s add this complement to the complements set. The second element is 3, this number is a complement of a previous element, therefore we have a valid pair here. Let&rsquo;s code the method that would do that:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">has_pair_with_sum_in_unordered_list</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">sum</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">complements</span> <span class="o">=</span> <span class="no">Set</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">value</span> <span class="o">=</span> <span class="n">input</span><span class="o">[</span><span class="n">i</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">complement</span> <span class="o">=</span> <span class="n">sum</span> <span class="o">-</span> <span class="n">value</span>
+</span><span class='line'>    <span class="c1"># if we have stored the value complement then we have a winner pair</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">complements</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="kp">true</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="n">complements</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">complement</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kp">false</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>benchmarking</h3>
+
+<p>Let&rsquo;s prove that the best solution is not the brute force method by using the <code>benchmark/ips</code> gem.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">ruby</span> <span class="n">sum_of_pair</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="no">Warming</span> <span class="n">up</span> <span class="o">--------------------------------------</span>
+</span><span class='line'>         <span class="n">brute</span> <span class="n">force</span>    <span class="mi">13</span><span class="o">.</span><span class="mo">000</span>  <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="n">pointer</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">ordered</span> <span class="n">list</span>
+</span><span class='line'>                         <span class="mi">1</span><span class="o">.</span><span class="mo">022</span><span class="n">k</span> <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="n">find</span> <span class="n">complement</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">unordered</span> <span class="n">list</span>
+</span><span class='line'>                       <span class="mi">647</span><span class="o">.</span><span class="mo">000</span>  <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="no">Calculating</span> <span class="o">-------------------------------------</span>
+</span><span class='line'>         <span class="n">brute</span> <span class="n">force</span>    <span class="mi">140</span><span class="o">.</span><span class="mi">826</span>  <span class="p">(</span><span class="err">±</span> <span class="mi">2</span><span class="o">.</span><span class="mi">8</span><span class="sx">%) i/s -    715.000  in   5.082566s</span>
+</span><span class='line'><span class="sx">pointer algorithm for ordered list</span>
+</span><span class='line'><span class="sx">                         10.314k (± 2.8%)</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span>     <span class="mi">52</span><span class="o">.</span><span class="mi">122</span><span class="n">k</span> <span class="k">in</span>   <span class="mi">5</span><span class="o">.</span><span class="mo">0573</span><span class="mi">93</span><span class="n">s</span>
+</span><span class='line'><span class="n">find</span> <span class="n">complement</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">unordered</span> <span class="n">list</span>
+</span><span class='line'>                          <span class="mi">7</span><span class="o">.</span><span class="mo">045</span><span class="n">k</span> <span class="p">(</span><span class="err">±</span><span class="mi">25</span><span class="o">.</span><span class="mi">5</span><span class="o">%</span><span class="p">)</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span>     <span class="mi">31</span><span class="o">.</span><span class="mi">703</span><span class="n">k</span> <span class="k">in</span>   <span class="mi">5</span><span class="o">.</span><span class="mo">064</span><span class="mi">816</span><span class="n">s</span>
+</span><span class='line'>
+</span><span class='line'><span class="ss">Comparison</span><span class="p">:</span>
+</span><span class='line'><span class="n">pointer</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">ordered</span> <span class="ss">list</span><span class="p">:</span>    <span class="mi">10314</span><span class="o">.</span><span class="mi">1</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span>
+</span><span class='line'><span class="n">find</span> <span class="n">complement</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">unordered</span> <span class="ss">list</span><span class="p">:</span>     <span class="mi">7045</span><span class="o">.</span><span class="mi">2</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1</span><span class="o">.</span><span class="mi">46</span><span class="n">x</span>  <span class="n">slower</span>
+</span><span class='line'>         <span class="n">brute</span> <span class="ss">force</span><span class="p">:</span>      <span class="mi">140</span><span class="o">.</span><span class="mi">8</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span> <span class="mi">73</span><span class="o">.</span><span class="mi">24</span><span class="n">x</span>  <span class="n">slower</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The brute force solution is 73.24 times slower than the unordered list algorithm. The unordered list algorithm is 1.46 times slower that the ordered list algorithm (very insignificant difference).</p>
+
+<h3>Conclusion</h3>
+
+<p>As you can see, there are multiple ways to solve an these common interview questions. Each method would lead to a perfect linear complexity solution. Ensuring you have identified the right assumptions is essential in solving similar problems.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafik Bennacer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-01-08T17:40:47-05:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/" data-via="" data-counturl="http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/01/23/intoduction-to-dynamic-programming/" title="Previous Post: Intoduction to Dynamic Programming">&laquo; Intoduction to Dynamic Programming</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2017/01/08/has-pair-with-some-problem/">'Pair With Sum' Problem</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/23/intoduction-to-dynamic-programming/">Intoduction to Dynamic Programming</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/">My experience from Railschallenge.com</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/">Find Who is Accessing my Google Drive Files</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">Upgrade to the new Universal Analytics Syntax in SQL</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2017 - Rafik Bennacer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'roadtomastery';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/';
+        var disqus_url = 'http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

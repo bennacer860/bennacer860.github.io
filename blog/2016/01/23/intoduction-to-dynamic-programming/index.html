@@ -9,7 +9,7 @@
   <meta name="author" content="Rafik Bennacer">
 
   
-  <meta name="description" content="As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use &hellip;">
+  <meta name="description" content="As a big fan of programming puzzles, I realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -109,13 +109,13 @@
   </header>
 
 
-<div class="entry-content"><p>As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use dynamic programming techniques. I know it sounds very tounting and fency but Dynamic programming is not. It is not as elegant as Recusion and require most of the time additional data structure to solve intermediate solutions.</p>
+<div class="entry-content"><p>As a big fan of programming puzzles, I realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use dynamic programming techniques. I know it sounds very taunting and fancy but Dynamic programming is not. It is not as elegant as Recursion and requires additional data structure to solve intermediate solutions most of the time.</p>
 
-<p>Wikipedia has a better definition than me and it is the folowing: <code>dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure</code>.</p>
+<p>Wikipedia has a better as follows: <code>dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure</code>.</p>
 
-<p>This is very iteresting. As software developer, don&rsquo;t we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? No so sure.</p>
+<p>This definition is very interesting. As a software developer, don&rsquo;t we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? Not so sure.</p>
 
-<p>In this post we will try to solve a very common problem (fibonacci sequence) in two ways and comment on how the methods of dynamic programming are more efficient.</p>
+<p>In this post we will try to solve a very common problem (ie Fibonacci Sequence) in two ways and demonstrate on how the methods of dynamic programming can be more efficient.</p>
 
 <h2>The Recusive way</h2>
 
@@ -134,7 +134,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>let see how <code>fib(4)</code> is calculated:</p>
+<p>let&rsquo;s see how <code>fib(4)</code> is calculated:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -155,12 +155,12 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>It seems a little bit confusing at first (That&rsquo;s recursion in general), but what i want you to notice is that we are solving the same problems over and over again. For example fib(2) is solved twice. You can imagine how trying to calculate the fibonacci sequence of a big number could result in a large amount of time. It takes 2-3 min to find the 50th term!</p>
+<p>It seems a bit confusing at first (that&rsquo;s recursion in general), but what I want you to notice is that we are solving the same problems over and over again. For example, fib(2) is solved twice. You can imagine how trying to calculate the Fibonacci sequence of a big number could result in a large amount of time. It acutally takes 2-3 minutes to find the 50th term!</p>
 
 <h2>The Dynamic programming way</h2>
 
-<p>Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called <a href="">memoisation</a>, Let&rsquo;s try to do so. in our example the intermediate solution could be fib(3) so let&rsquo;s store it in an array so we don&rsquo;t have to re caluculate it. And let&rsquo;s do this for all the other number.
-Here is what the solution look like.</p>
+<p>Since the topic is Dynamic Programming and it is all breaking down the complex problems to simpler ones and storing their solution, this is called <a href="https://en.wikipedia.org/wiki/Memoization">Memoization</a> by the way. Let&rsquo;s try this. In our example the intermediate solution could be fib(3), so let&rsquo;s store it in an array so we don&rsquo;t have to recalculate it, And let&rsquo;s do this for all the other numbers.
+Here is what the solution should look like:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -183,7 +183,7 @@ Here is what the solution look like.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This solution looks much more efficient, it will find the fibonacci sequenece with <code>n</code> complexity. Let&rsquo;s try to benchmark it though:</p>
+<p>This solution looks more efficient, it will find the Fibonacci Sequence with <code>n</code> complexity. Let&rsquo;s benchmark it though:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -239,7 +239,7 @@ Here is what the solution look like.</p>
 
 <h1>Conclusion</h1>
 
-<p>Once you see how ti would, it would seem very natural to implement these methods to solve certain class of problems. Whenever you see recusion you might have a chance to optimize your code using Dynamic programming.</p>
+<p>Once you see how it works, it would seem very natural to implement these methods to solve a certain class of problems. Whenever you see recursion you might have a chance to optimize your code using Dynamic Programming.</p>
 </div>
 
 
@@ -286,6 +286,8 @@ Here is what the solution look like.</p>
         <a class="basic-alignment left" href="/blog/2015/08/16/my-experience-from-railschallenge-dot-com/" title="Previous Post: My experience from Railschallenge.com">&laquo; My experience from Railschallenge.com</a>
       
       
+        <a class="basic-alignment right" href="/blog/2017/01/08/has-pair-with-some-problem/" title="Next Post: 'Pair With Sum' Problem">'Pair With Sum' Problem &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -305,6 +307,10 @@ Here is what the solution look like.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/01/08/has-pair-with-some-problem/">'Pair With Sum' Problem</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/01/23/intoduction-to-dynamic-programming/">Intoduction to Dynamic Programming</a>
       </li>
     
@@ -318,10 +324,6 @@ Here is what the solution look like.</p>
     
       <li class="post">
         <a href="/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/">Upgrade to the new Universal Analytics Syntax in SQL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/03/15/coalesce/">Coalesce</a>
       </li>
     
   </ul>
@@ -338,7 +340,7 @@ Here is what the solution look like.</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Rafik Bennacer -
+  Copyright &copy; 2017 - Rafik Bennacer -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

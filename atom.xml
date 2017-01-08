@@ -4,7 +4,7 @@
   <title><![CDATA[The Road To Mastery]]></title>
   <link href="http://bennacer860.github.io/atom.xml" rel="self"/>
   <link href="http://bennacer860.github.io/"/>
-  <updated>2016-01-24T12:57:08-05:00</updated>
+  <updated>2017-01-08T18:02:10-05:00</updated>
   <id>http://bennacer860.github.io/</id>
   <author>
     <name><![CDATA[Rafik Bennacer]]></name>
@@ -14,17 +14,195 @@
 
   
   <entry>
+    <title type="html"><![CDATA['Pair With Sum' Problem]]></title>
+    <link href="http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/"/>
+    <updated>2017-01-08T17:40:47-05:00</updated>
+    <id>http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem</id>
+    <content type="html"><![CDATA[<p>Recently, I Have been researching common coding interview-problems and I&rsquo;ve discovered that most of the major tech companies like Google or facebook have overlapping problem lists. One of these problems is called <code>Pair With Sum</code> and it states the following <code>Find a pair of elements from an array whose sum equals a given number</code>.</p>
+
+<p>This request is a bit ambiguous - so let&rsquo;s start out by listing all the assumptions that we are making before we begin working on a solution:</p>
+
+<ul>
+<li> The array contains only integers</li>
+<li> The array can have duplicates</li>
+<li> Return a boolean that indicates if the list has such a pair</li>
+<li> We will start with an ordered (ascending order) list example</li>
+</ul>
+
+
+<h3>Brute force</h3>
+
+<p>Lets code the most naive solution. Basically, try every pair possible and see if their sum is equal to the given number. It would look like this in Ruby</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">has_pair_with_sum_brute_force</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">sum</span><span class="p">)</span>
+</span><span class='line'>  <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+</span><span class='line'>    <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">n</span><span class="o">]</span> <span class="o">==</span> <span class="n">sum</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">i</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kp">true</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kp">false</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This solution would work whether the list is sorted or not. However, this is an inefficient way of solving the problem, indicated by the complexity of this algorithm at O(n<sup>2</sup>). This will get out of control pretty quickly for large arrays. We need a solution that has a linear complexity or a O(n). Let&rsquo;s explore another solution where we assume that the array elemets are sorted.</p>
+
+<h3>Moving pointer</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">has_pair_with_sum_in_ordered_list</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">sum</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">pointer_begining</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="n">pointer_end</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">while</span><span class="p">(</span><span class="n">pointer_begining</span> <span class="o">&lt;</span> <span class="n">pointer_end</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># puts pointer_begining</span>
+</span><span class='line'>    <span class="c1"># puts pointer_end</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kp">true</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_begining</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_end</span><span class="o">]</span> <span class="o">==</span> <span class="n">sum</span>
+</span><span class='line'>    <span class="n">pointer_end</span> <span class="o">-=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_begining</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_end</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">sum</span>
+</span><span class='line'>    <span class="n">pointer_begining</span> <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_begining</span><span class="o">]</span> <span class="o">+</span> <span class="n">input</span><span class="o">[</span><span class="n">pointer_end</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">sum</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kp">false</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This solution has the algorithm complexity of O(n) we are looking for, making it much more scalable and efficient. Let&rsquo;s go over the solution briefly. We have one pointer at the begining of the array and one at the end. we sum the value pointed with the two pointer</p>
+
+<ul>
+<li> If the sum is equal to the given number then we have found a solution</li>
+<li> If the sum is greater than the given number then the sum is too big, so we move the last pointer to the value before it</li>
+<li> If the sum is smaller than the given number then the sum is too small so we move the last pointer to the value after it</li>
+</ul>
+
+
+<h3>Saving the Complement</h3>
+
+<p>Imagine now that our list is not ordered, In this case, the previous method would not work. We need to come up with another algorithm with a linear complexity to retain our scalability. We note that in order for us to determine if a number has a pair, that the sum would equal to the given number, it needs to have its complement in the array. Let&rsquo;s assume that the first element of the array is 2 and that the given number is 8- the complement of 2 to make 8 is <code>8-2=6</code>. If we find 6 in the array, we know that it represents a valid pair.</p>
+
+<p>Here&rsquo;s an example:</p>
+
+<p><code>array = [1,3,2],  given_number = 4</code></p>
+
+<p>Let&rsquo;s go through this array and save the complements in some data structure. The ideal data structure in this case would be some kind of hash that would save only keys. The reason why we would choose this data structure is because it will ensure our collection constantly maintains unique elements (no redundancy) and it will do the element look up in a constant complexity O(1). In Ruby we can use the <a href="http://ruby-doc.org/stdlib-2.3.3/libdoc/set/rdoc/Set.html">Set</a> library.</p>
+
+<p>Back to our array traversal. The first element is 1, its complement is (4-1=3), let&rsquo;s add this complement to the complements set. The second element is 3, this number is a complement of a previous element, therefore we have a valid pair here. Let&rsquo;s code the method that would do that:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">has_pair_with_sum_in_unordered_list</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">sum</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">complements</span> <span class="o">=</span> <span class="no">Set</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="mi">0</span><span class="o">.</span><span class="n">upto</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">value</span> <span class="o">=</span> <span class="n">input</span><span class="o">[</span><span class="n">i</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">complement</span> <span class="o">=</span> <span class="n">sum</span> <span class="o">-</span> <span class="n">value</span>
+</span><span class='line'>    <span class="c1"># if we have stored the value complement then we have a winner pair</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">complements</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="kp">true</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="n">complements</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">complement</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">return</span> <span class="kp">false</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>benchmarking</h3>
+
+<p>Let&rsquo;s prove that the best solution is not the brute force method by using the <code>benchmark/ips</code> gem.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="err">$</span> <span class="n">ruby</span> <span class="n">sum_of_pair</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="no">Warming</span> <span class="n">up</span> <span class="o">--------------------------------------</span>
+</span><span class='line'>         <span class="n">brute</span> <span class="n">force</span>    <span class="mi">13</span><span class="o">.</span><span class="mo">000</span>  <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="n">pointer</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">ordered</span> <span class="n">list</span>
+</span><span class='line'>                         <span class="mi">1</span><span class="o">.</span><span class="mo">022</span><span class="n">k</span> <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="n">find</span> <span class="n">complement</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">unordered</span> <span class="n">list</span>
+</span><span class='line'>                       <span class="mi">647</span><span class="o">.</span><span class="mo">000</span>  <span class="n">i</span><span class="o">/</span><span class="mi">100</span><span class="n">ms</span>
+</span><span class='line'><span class="no">Calculating</span> <span class="o">-------------------------------------</span>
+</span><span class='line'>         <span class="n">brute</span> <span class="n">force</span>    <span class="mi">140</span><span class="o">.</span><span class="mi">826</span>  <span class="p">(</span><span class="err">±</span> <span class="mi">2</span><span class="o">.</span><span class="mi">8</span><span class="sx">%) i/s -    715.000  in   5.082566s</span>
+</span><span class='line'><span class="sx">pointer algorithm for ordered list</span>
+</span><span class='line'><span class="sx">                         10.314k (± 2.8%)</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span>     <span class="mi">52</span><span class="o">.</span><span class="mi">122</span><span class="n">k</span> <span class="k">in</span>   <span class="mi">5</span><span class="o">.</span><span class="mo">0573</span><span class="mi">93</span><span class="n">s</span>
+</span><span class='line'><span class="n">find</span> <span class="n">complement</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">unordered</span> <span class="n">list</span>
+</span><span class='line'>                          <span class="mi">7</span><span class="o">.</span><span class="mo">045</span><span class="n">k</span> <span class="p">(</span><span class="err">±</span><span class="mi">25</span><span class="o">.</span><span class="mi">5</span><span class="o">%</span><span class="p">)</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span>     <span class="mi">31</span><span class="o">.</span><span class="mi">703</span><span class="n">k</span> <span class="k">in</span>   <span class="mi">5</span><span class="o">.</span><span class="mo">064</span><span class="mi">816</span><span class="n">s</span>
+</span><span class='line'>
+</span><span class='line'><span class="ss">Comparison</span><span class="p">:</span>
+</span><span class='line'><span class="n">pointer</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">ordered</span> <span class="ss">list</span><span class="p">:</span>    <span class="mi">10314</span><span class="o">.</span><span class="mi">1</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span>
+</span><span class='line'><span class="n">find</span> <span class="n">complement</span> <span class="n">algorithm</span> <span class="k">for</span> <span class="n">unordered</span> <span class="ss">list</span><span class="p">:</span>     <span class="mi">7045</span><span class="o">.</span><span class="mi">2</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1</span><span class="o">.</span><span class="mi">46</span><span class="n">x</span>  <span class="n">slower</span>
+</span><span class='line'>         <span class="n">brute</span> <span class="ss">force</span><span class="p">:</span>      <span class="mi">140</span><span class="o">.</span><span class="mi">8</span> <span class="n">i</span><span class="o">/</span><span class="n">s</span> <span class="o">-</span> <span class="mi">73</span><span class="o">.</span><span class="mi">24</span><span class="n">x</span>  <span class="n">slower</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The brute force solution is 73.24 times slower than the unordered list algorithm. The unordered list algorithm is 1.46 times slower that the ordered list algorithm (very insignificant difference).</p>
+
+<h3>Conclusion</h3>
+
+<p>As you can see, there are multiple ways to solve an these common interview questions. Each method would lead to a perfect linear complexity solution. Ensuring you have identified the right assumptions is essential in solving similar problems.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Intoduction to Dynamic Programming]]></title>
     <link href="http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/"/>
     <updated>2016-01-23T22:16:49-05:00</updated>
     <id>http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming</id>
-    <content type="html"><![CDATA[<p>As a big fan of programming puzzles i realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use dynamic programming techniques. I know it sounds very tounting and fency but Dynamic programming is not. It is not as elegant as Recusion and require most of the time additional data structure to solve intermediate solutions.</p>
+    <content type="html"><![CDATA[<p>As a big fan of programming puzzles, I realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use dynamic programming techniques. I know it sounds very taunting and fancy but Dynamic programming is not. It is not as elegant as Recursion and requires additional data structure to solve intermediate solutions most of the time.</p>
 
-<p>Wikipedia has a better definition than me and it is the folowing: <code>dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure</code>.</p>
+<p>Wikipedia has a better as follows: <code>dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure</code>.</p>
 
-<p>This is very iteresting. As software developer, don&rsquo;t we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? No so sure.</p>
+<p>This definition is very interesting. As a software developer, don&rsquo;t we always try to break down all problems into a collection of simpler problems? The answer is yes. Do we always try to store their solutions in a data structure? Not so sure.</p>
 
-<p>In this post we will try to solve a very common problem (fibonacci sequence) in two ways and comment on how the methods of dynamic programming are more efficient.</p>
+<p>In this post we will try to solve a very common problem (ie Fibonacci Sequence) in two ways and demonstrate on how the methods of dynamic programming can be more efficient.</p>
 
 <h2>The Recusive way</h2>
 
@@ -43,7 +221,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>let see how <code>fib(4)</code> is calculated:</p>
+<p>let&rsquo;s see how <code>fib(4)</code> is calculated:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -64,12 +242,12 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>It seems a little bit confusing at first (That&rsquo;s recursion in general), but what i want you to notice is that we are solving the same problems over and over again. For example fib(2) is solved twice. You can imagine how trying to calculate the fibonacci sequence of a big number could result in a large amount of time. It takes 2-3 min to find the 50th term!</p>
+<p>It seems a bit confusing at first (that&rsquo;s recursion in general), but what I want you to notice is that we are solving the same problems over and over again. For example, fib(2) is solved twice. You can imagine how trying to calculate the Fibonacci sequence of a big number could result in a large amount of time. It acutally takes 2-3 minutes to find the 50th term!</p>
 
 <h2>The Dynamic programming way</h2>
 
-<p>Since the topic is dynamic programming and it is all breaking down the complex problems to simpler ones and storing their solution, which is by the way called <a href="">memoisation</a>, Let&rsquo;s try to do so. in our example the intermediate solution could be fib(3) so let&rsquo;s store it in an array so we don&rsquo;t have to re caluculate it. And let&rsquo;s do this for all the other number.
-Here is what the solution look like.</p>
+<p>Since the topic is Dynamic Programming and it is all breaking down the complex problems to simpler ones and storing their solution, this is called <a href="https://en.wikipedia.org/wiki/Memoization">Memoization</a> by the way. Let&rsquo;s try this. In our example the intermediate solution could be fib(3), so let&rsquo;s store it in an array so we don&rsquo;t have to recalculate it, And let&rsquo;s do this for all the other numbers.
+Here is what the solution should look like:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -92,7 +270,7 @@ Here is what the solution look like.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This solution looks much more efficient, it will find the fibonacci sequenece with <code>n</code> complexity. Let&rsquo;s try to benchmark it though:</p>
+<p>This solution looks more efficient, it will find the Fibonacci Sequence with <code>n</code> complexity. Let&rsquo;s benchmark it though:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -148,7 +326,7 @@ Here is what the solution look like.</p>
 
 <h1>Conclusion</h1>
 
-<p>Once you see how ti would, it would seem very natural to implement these methods to solve certain class of problems. Whenever you see recusion you might have a chance to optimize your code using Dynamic programming.</p>
+<p>Once you see how it works, it would seem very natural to implement these methods to solve a certain class of problems. Whenever you see recursion you might have a chance to optimize your code using Dynamic Programming.</p>
 ]]></content>
   </entry>
   
@@ -1389,7 +1567,7 @@ We can also extend this project to make have a full map with more than one line 
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="s2">&quot;kfgpmgvfgacx98de9q3xazww&quot;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="s2">&quot;kfgpmgvfgacx98de9q3xazww&quot;</span>
 </span><span class='line'><span class="no">WMATA</span><span class="o">.</span><span class="n">next_trains</span><span class="p">(</span><span class="s2">&quot;A01&quot;</span><span class="p">)</span> <span class="c1"># A01 stands for a station code</span>
 </span></code></pre></td></tr></table></div></figure>
 
