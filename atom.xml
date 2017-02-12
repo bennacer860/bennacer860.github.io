@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[The Road To Mastery]]></title>
-  <link href="http://bennacer860.github.io/atom.xml" rel="self"/>
-  <link href="http://bennacer860.github.io/"/>
-  <updated>2017-01-08T18:02:10-05:00</updated>
-  <id>http://bennacer860.github.io/</id>
+  <link href="http://routetomastery.com/atom.xml" rel="self"/>
+  <link href="http://routetomastery.com/"/>
+  <updated>2017-02-12T10:03:11-05:00</updated>
+  <id>http://routetomastery.com/</id>
   <author>
     <name><![CDATA[Rafik Bennacer]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA['Pair With Sum' Problem]]></title>
-    <link href="http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem/"/>
+    <link href="http://routetomastery.com/blog/2017/01/08/has-pair-with-some-problem/"/>
     <updated>2017-01-08T17:40:47-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2017/01/08/has-pair-with-some-problem</id>
+    <id>http://routetomastery.com/blog/2017/01/08/has-pair-with-some-problem</id>
     <content type="html"><![CDATA[<p>Recently, I Have been researching common coding interview-problems and I&rsquo;ve discovered that most of the major tech companies like Google or facebook have overlapping problem lists. One of these problems is called <code>Pair With Sum</code> and it states the following <code>Find a pair of elements from an array whose sum equals a given number</code>.</p>
 
 <p>This request is a bit ambiguous - so let&rsquo;s start out by listing all the assumptions that we are making before we begin working on a solution:</p>
@@ -193,9 +193,9 @@
   
   <entry>
     <title type="html"><![CDATA[Intoduction to Dynamic Programming]]></title>
-    <link href="http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming/"/>
+    <link href="http://routetomastery.com/blog/2016/01/23/intoduction-to-dynamic-programming/"/>
     <updated>2016-01-23T22:16:49-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2016/01/23/intoduction-to-dynamic-programming</id>
+    <id>http://routetomastery.com/blog/2016/01/23/intoduction-to-dynamic-programming</id>
     <content type="html"><![CDATA[<p>As a big fan of programming puzzles, I realized that the harder the problems get, the less equipped you are to solve them if you don&rsquo;t use dynamic programming techniques. I know it sounds very taunting and fancy but Dynamic programming is not. It is not as elegant as Recursion and requires additional data structure to solve intermediate solutions most of the time.</p>
 
 <p>Wikipedia has a better as follows: <code>dynamic programming is a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions - ideally, using a memory-based data structure</code>.</p>
@@ -332,9 +332,9 @@ Here is what the solution should look like:</p>
   
   <entry>
     <title type="html"><![CDATA[My experience from Railschallenge.com]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/08/16/my-experience-from-railschallenge-dot-com/"/>
+    <link href="http://routetomastery.com/blog/2015/08/16/my-experience-from-railschallenge-dot-com/"/>
     <updated>2015-08-16T18:13:16-04:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/08/16/my-experience-from-railschallenge-dot-com</id>
+    <id>http://routetomastery.com/blog/2015/08/16/my-experience-from-railschallenge-dot-com</id>
     <content type="html"><![CDATA[<h1>Rails challenge</h1>
 
 <p>A couple of months ago I stumbled on a reddit post talking about a <a href="http://railschallenge.com/">Rails challenge</a>. I accepted the challenge and finished it with no error. In this blog i would try to share what i learned form that experience.</p>
@@ -416,9 +416,9 @@ Here is what the solution should look like:</p>
   
   <entry>
     <title type="html"><![CDATA[Find Who is Accessing my Google Drive Files]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/"/>
+    <link href="http://routetomastery.com/blog/2015/07/12/find-who-is-accessing-my-google-drive-files/"/>
     <updated>2015-07-12T15:20:15-04:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/07/12/find-who-is-accessing-my-google-drive-files</id>
+    <id>http://routetomastery.com/blog/2015/07/12/find-who-is-accessing-my-google-drive-files</id>
     <content type="html"><![CDATA[<p>I Recently had to share some documents from my Google Drive with a team of developers outside the office. Most of these documents were API docs. After a couple of months and when those developers didn&rsquo;t need the API docs anymore, it was almost impossible for me to find what i shared with them, it was like looking for a needle in a haystack. I bet i am not the only one that had this problem before!!!</p>
 
 <p>So how would i do that manually. I would go to each file and click on share button. see the list of the permission and remove the users i don&rsquo;t want to. It means that i would need to go through 200 files!!! I am too lazy for that!!</p>
@@ -640,9 +640,9 @@ Here is what the solution should look like:</p>
   
   <entry>
     <title type="html"><![CDATA[Upgrade to the new Universal Analytics Syntax in SQL]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/"/>
+    <link href="http://routetomastery.com/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql/"/>
     <updated>2015-07-12T15:14:18-04:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql</id>
+    <id>http://routetomastery.com/blog/2015/07/12/upgrade-to-the-new-universal-analytics-syntax-in-sql</id>
     <content type="html"><![CDATA[<p>Upgrade to the Universal Analytics Syntax in SQL</p>
 
 <p>We are all struggling with upgrading our analytics tools from the old ga.js to the new universal.js plateform.
@@ -699,9 +699,9 @@ Most of it is done automatically and would require just changing that ga.js file
   
   <entry>
     <title type="html"><![CDATA[Coalesce]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/03/15/coalesce/"/>
+    <link href="http://routetomastery.com/blog/2015/03/15/coalesce/"/>
     <updated>2015-03-15T23:47:14-04:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/03/15/coalesce</id>
+    <id>http://routetomastery.com/blog/2015/03/15/coalesce</id>
     <content type="html"><![CDATA[<p>If you have never heard about the <code>coalesce</code> function, this will be very helpful.
 Basically this function exist in most modern DBMS and the definition reads, <code>The COALESCE function in SQL returns the first non-NULL expression among its arguments.</code></p>
 
@@ -795,9 +795,9 @@ Now, I am wondering what would happen if both of the values where null, let&rsqu
   
   <entry>
     <title type="html"><![CDATA[Fun with next train]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train/"/>
+    <link href="http://routetomastery.com/blog/2015/02/28/fun-with-next-train/"/>
     <updated>2015-02-28T20:47:14-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/02/28/fun-with-next-train</id>
+    <id>http://routetomastery.com/blog/2015/02/28/fun-with-next-train</id>
     <content type="html"><![CDATA[<h2>Introduction</h2>
 
 <p><img src="http://i.imgur.com/Ui1zIEI.png" alt="enter image description here" /></p>
@@ -969,9 +969,9 @@ We can also extend this project to make have a full map with more than one line 
   
   <entry>
     <title type="html"><![CDATA[ActiveRecord dirty change]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/02/26/activerecord-dirty-change/"/>
+    <link href="http://routetomastery.com/blog/2015/02/26/activerecord-dirty-change/"/>
     <updated>2015-02-26T22:47:14-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/02/26/activerecord-dirty-change</id>
+    <id>http://routetomastery.com/blog/2015/02/26/activerecord-dirty-change</id>
     <content type="html"><![CDATA[<p>Today, After chatting with my colleague and try to fix some <a href="http://api.rubyonrails.org/classes/ActiveRecord/Store.html">ActiveRecord Store bug</a>, he showed me some very neat <a href="http://api.rubyonrails.org/classes/ActiveModel/Dirty.html">ActiveRecord:Dirty</a> method called changed.</p>
 
 <p>I went to Rails documentation and found out the module that allows all this magic. It will tell you if anything has changed on the object.</p>
@@ -1018,9 +1018,9 @@ We can also extend this project to make have a full map with more than one line 
   
   <entry>
     <title type="html"><![CDATA[Rspec internals (part 1)]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/02/17/rspec-internals-part-1/"/>
+    <link href="http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1/"/>
     <updated>2015-02-17T13:53:30-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/02/17/rspec-internals-part-1</id>
+    <id>http://routetomastery.com/blog/2015/02/17/rspec-internals-part-1</id>
     <content type="html"><![CDATA[<p>If you wonder how Rspec is built and is curious about the internals of such a tool then this article is for you. After watching an episode from the excellent <a href="https://www.destroyallsoftware.com/talks">Gary Bernhard&rsquo;s Destroy all software series</a> ,i decided to blog about it to make sure i understand how it works.</p>
 
 <p>We will use Minitest TestCase to test the most basic Rspec syntax. As usual let&rsquo;s write two tests, one that pass and another one that fails. And we will write the code that defines the Rspec features in spec.rb. but lets start with just the tests:</p>
@@ -1318,9 +1318,9 @@ We can also extend this project to make have a full map with more than one line 
   
   <entry>
     <title type="html"><![CDATA[Create your first API wrapper with TDD]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/"/>
+    <link href="http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd/"/>
     <updated>2015-02-04T22:47:14-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/02/04/create-your-first-api-wrapper-with-tdd</id>
+    <id>http://routetomastery.com/blog/2015/02/04/create-your-first-api-wrapper-with-tdd</id>
     <content type="html"><![CDATA[<p>Whether at you job or personal projects you would need at some point have to build you own API wrapper in ruby. Today, i decided to build my own Wrapper that i will turn into a gem in a later blog post. I want to do it methodically according to Test Driven Development principles.</p>
 
 <p>It is always a hassle to test API calls but there is a way on how it should be done and we will talk about it later on.</p>
@@ -1580,9 +1580,9 @@ We can also extend this project to make have a full map with more than one line 
   
   <entry>
     <title type="html"><![CDATA[HTTParty debugging]]></title>
-    <link href="http://bennacer860.github.io/blog/2015/01/02/httparty-debugging/"/>
+    <link href="http://routetomastery.com/blog/2015/01/02/httparty-debugging/"/>
     <updated>2015-01-02T15:24:47-05:00</updated>
-    <id>http://bennacer860.github.io/blog/2015/01/02/httparty-debugging</id>
+    <id>http://routetomastery.com/blog/2015/01/02/httparty-debugging</id>
     <content type="html"><![CDATA[<p>Whenever you start working on API call you should use HTTParty. In my opinion it is the best tool to make a API wrapper in a very modular way.I have been playing with it lately, and i got this weird error</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>

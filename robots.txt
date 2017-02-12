@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://bennacer860.github.io/sitemap.xml 
+Sitemap: http://routetomastery.com/sitemap.xml 
